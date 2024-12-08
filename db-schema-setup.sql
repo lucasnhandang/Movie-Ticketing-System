@@ -87,11 +87,11 @@ CREATE TABLE Voucher (
 );
 
 CREATE TABLE Redemption (
-    User_id INT REFERENCES "User"(User_id),
-    Voucher_id INT REFERENCES Voucher(Voucher_id),
-    Redeem_Date TIMESTAMP,
-    Status VARCHAR(10) CHECK (Status IN ('Active', 'Used', 'Expired')),
-    PRIMARY KEY (User_id, Voucher_id)
+    redemption_id SERIAL PRIMARY KEY,           
+    user_id INT REFERENCES "User"(User_id),     
+    voucher_id INT REFERENCES Voucher(Voucher_id), 
+    redeem_date TIMESTAMP,                      
+    status VARCHAR(10) CHECK (status IN ('Active', 'Used', 'Expired'))  
 );
 
 CREATE TABLE Admin (
@@ -104,23 +104,23 @@ CREATE TABLE Admin (
 );
 
 CREATE TABLE ShowtimeManagement (
-	Admin_id INT REFERENCES Admin(Admin_id),
-	Showtime_id INT REFERENCES Showtime(Showtime_id),
-	Manage_Date TIMESTAMP,
-	PRIMARY KEY (Admin_id, Showtime_id)
+    manage_id INT PRIMARY KEY,             
+    admin_id INT REFERENCES Admin(Admin_id),  
+    showtime_id INT REFERENCES Showtime(Showtime_id), 
+    manage_date TIMESTAMP                     
 );
 
 CREATE TABLE MovieManagement (
-	Admin_id INT REFERENCES Admin(Admin_id),
-	Movie_id INT REFERENCES Movie(Movie_id),
-	Manage_Date TIMESTAMP,
-	PRIMARY KEY (Admin_id, Movie_id)
+    manage_id INT PRIMARY KEY,             
+    admin_id INT REFERENCES Admin(Admin_id),  
+    movie_id INT REFERENCES Movie(Movie_id),  
+    manage_date TIMESTAMP                    
 );
 
 CREATE TABLE VoucherManagement (
-	Admin_id INT REFERENCES Admin(Admin_id),
-	Voucher_id INT REFERENCES Voucher(Voucher_id),
-	Manage_Date TIMESTAMP,
-	PRIMARY KEY (Admin_id, Voucher_id)
+    manage_id INT PRIMARY KEY,             
+    admin_id INT REFERENCES Admin(Admin_id),  
+    voucher_id INT REFERENCES Voucher(Voucher_id),
+    manage_date TIMESTAMP                     
 );
 
