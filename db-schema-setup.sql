@@ -4,7 +4,7 @@ CREATE TABLE "User" (
     Email VARCHAR(100) UNIQUE NOT NULL,
     Password VARCHAR(100) NOT NULL,
 	Phone VARCHAR(20),
-    Address TEXT,
+    Address VARCHAR(200),
 	Date_Joined TIMESTAMP,
 	Dob DATE,
     Loyalty_Points INT
@@ -33,7 +33,7 @@ CREATE TABLE MovieGenre (
 
 CREATE TABLE Theater (
     Theater_id INT PRIMARY KEY,
-    Name VARCHAR(100) NOT NULL,
+    Name VARCHAR(200) NOT NULL,
     Address VARCHAR(200),
     City VARCHAR(100),
     Total_Rooms INT
@@ -46,12 +46,18 @@ CREATE TABLE Room (
 	Theater_id INT REFERENCES Theater(Theater_id)
 );
 
+CREATE TABLE SeatType (
+    Seattype_id INT PRIMARY KEY,
+    Name VARCHAR(20),
+    Price INT
+);
+
 CREATE TABLE Seat (
     Seat_id INT PRIMARY KEY,
-    Name VARCHAR(10),
-    Type VARCHAR(10) CHECK (Type IN ('Standard', 'VIP', 'Couple')),
-	Price INT,
-	Room_id INT REFERENCES Room(Room_id)
+    Row VARCHAR(2),
+    Number INT,
+    Seattype_id INT REFERENCES SeatType(Seattype_id),
+    Room_id INT REFERENCES Room(Room_id)
 );
 
 CREATE TABLE Showtime (
@@ -63,6 +69,14 @@ CREATE TABLE Showtime (
 	Movie_id INT REFERENCES Movie(Movie_id)
 );
 
+CREATE TABLE Voucher (
+    Voucher_id INT PRIMARY KEY,
+	Description TEXT,
+    Discount_Percentage INT CHECK (Discount_Percentage BETWEEN 10 AND 100),
+    Expiry_Date TIMESTAMP,
+    PointsRequired INT
+);
+
 CREATE TABLE Booking (
     Booking_id INT PRIMARY KEY,
     Date DATE,
@@ -72,26 +86,19 @@ CREATE TABLE Booking (
     Voucher_id INT REFERENCES Voucher(Voucher_id)
 );
 
-CREATE TABLE BookingSeat (
-	Booking_id INT REFERENCES Booking(Booking_id),
-	Seat_id INT REFERENCES Seat(Seat_id),
-	PRIMARY KEY (Booking_id, Seat_id)
-);
-
-CREATE TABLE Voucher (
-    Voucher_id INT PRIMARY KEY,
-	Description TEXT,
-    Discount_Percentage INT CHECK (Discount_Percentage BETWEEN 10 AND 100),
-    Expiry_Date TIMESTAMP,
-    PointsRequired INT
+CREATE TABLE BookingSeatShowtime (
+    Booking_id INT REFERENCES Booking(Booking_id),
+    Seat_id INT REFERENCES Seat(Seat_id),
+    Showtime_id INT REFERENCES Showtime(Showtime_id),
+    PRIMARY KEY (Booking_id, Seat_id, Showtime_id)
 );
 
 CREATE TABLE Redemption (
-    redemption_id SERIAL PRIMARY KEY,           
-    user_id INT REFERENCES "User"(User_id),     
-    voucher_id INT REFERENCES Voucher(Voucher_id), 
-    redeem_date TIMESTAMP,                      
-    status VARCHAR(10) CHECK (status IN ('Active', 'Used', 'Expired'))  
+    User_id INT REFERENCES "User"(User_id),
+    Voucher_id INT REFERENCES Voucher(Voucher_id),
+    Redeem_Date TIMESTAMP,
+    Status VARCHAR(10) CHECK (Status IN ('Available', 'Used', 'Expired')),
+    PRIMARY KEY (User_id, Voucher_id)
 );
 
 CREATE TABLE Admin (
@@ -107,20 +114,22 @@ CREATE TABLE ShowtimeManagement (
     manage_id INT PRIMARY KEY,             
     admin_id INT REFERENCES Admin(Admin_id),  
     showtime_id INT REFERENCES Showtime(Showtime_id), 
-    manage_date TIMESTAMP                     
+    manage_date TIMESTAMP,
+	description VARCHAR(10)
 );
 
 CREATE TABLE MovieManagement (
     manage_id INT PRIMARY KEY,             
     admin_id INT REFERENCES Admin(Admin_id),  
     movie_id INT REFERENCES Movie(Movie_id),  
-    manage_date TIMESTAMP                    
+    manage_date TIMESTAMP,
+	description VARCHAR(10)                    
 );
 
 CREATE TABLE VoucherManagement (
     manage_id INT PRIMARY KEY,             
     admin_id INT REFERENCES Admin(Admin_id),  
     voucher_id INT REFERENCES Voucher(Voucher_id),
-    manage_date TIMESTAMP                     
+    manage_date TIMESTAMP,
+	description VARCHAR(10)                     
 );
-
