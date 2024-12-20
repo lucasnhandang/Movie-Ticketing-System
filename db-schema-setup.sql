@@ -81,8 +81,8 @@ CREATE TABLE Booking (
     Booking_id INT PRIMARY KEY,
     Date DATE,
     Status VARCHAR(10) CHECK (Status IN ('Pending', 'Confirmed', 'Cancelled')),
-    User_id INT REFERENCES "User"(User_id),
-    Showtime_id INT REFERENCES Showtime(Showtime_id),
+    User_id INT NOT NULL REFERENCES "User"(User_id),
+    Showtime_id INT NOT NULL REFERENCES Showtime(Showtime_id),
     Voucher_id INT REFERENCES Voucher(Voucher_id)
 );
 
