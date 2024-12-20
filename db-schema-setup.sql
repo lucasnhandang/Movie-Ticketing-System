@@ -2,7 +2,7 @@ CREATE TABLE "User" (
     User_id INT PRIMARY KEY,
     Name VARCHAR(100) NOT NULL,
     Email VARCHAR(100) UNIQUE NOT NULL,
-    Password VARCHAR(100) NOT NULL,
+    Password VARCHAR(50) NOT NULL,
 	Phone VARCHAR(20),
     Address VARCHAR(200),
 	Date_Joined TIMESTAMP,
@@ -14,7 +14,7 @@ CREATE TABLE Movie (
     Movie_id INT PRIMARY KEY,
     Title VARCHAR(100) NOT NULL,
 	Description TEXT,
-    Language VARCHAR(50),
+    Language VARCHAR(10),
 	Rating DECIMAL(2, 1),
     Duration INT,
     Release_Date DATE
@@ -74,23 +74,22 @@ CREATE TABLE Voucher (
 	Description TEXT,
     Discount_Percentage INT CHECK (Discount_Percentage BETWEEN 10 AND 100),
     Expiry_Date TIMESTAMP,
-    PointsRequired INT
+    Points_Required INT
 );
 
 CREATE TABLE Booking (
     Booking_id INT PRIMARY KEY,
-    Date DATE,
+    Time TIMESTAMP,
     Status VARCHAR(10) CHECK (Status IN ('Pending', 'Confirmed', 'Cancelled')),
     User_id INT NOT NULL REFERENCES "User"(User_id),
     Showtime_id INT NOT NULL REFERENCES Showtime(Showtime_id),
     Voucher_id INT REFERENCES Voucher(Voucher_id)
 );
 
-CREATE TABLE BookingSeatShowtime (
+CREATE TABLE BookingSeat (
     Booking_id INT REFERENCES Booking(Booking_id),
     Seat_id INT REFERENCES Seat(Seat_id),
-    Showtime_id INT REFERENCES Showtime(Showtime_id),
-    PRIMARY KEY (Booking_id, Seat_id, Showtime_id)
+    PRIMARY KEY (Booking_id, Seat_id)
 );
 
 CREATE TABLE Redemption (
