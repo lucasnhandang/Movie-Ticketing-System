@@ -97,7 +97,7 @@ GRANT INSERT ON Admin TO admin_role;
 
 -- Quản lý toàn quyền các bảng Movie, Showtime, Voucher và Booking
 GRANT ALL PRIVILEGES ON Movie, MovieManagement, Showtime, ShowtimeManagement,
-Voucher, VoucherManagement, Booking, BookingSeatShowtime, Redemption TO admin_role;
+Voucher, VoucherManagement, Booking, BookingSeat, Redemption TO admin_role;
 
 -- ################################################################################
 
