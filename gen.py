@@ -325,35 +325,94 @@ def generate_voucher_management(admins, vouchers):
     return managements
 
 # Movies
+import random
+from faker import Faker
+
+fake = Faker()
+
 def generate_movies(n):
     movies_by_language = {
         "Vietnamese": [
             "Em va Trinh", "Mat Biec", "Co Ba Sai Gon", "Hai Phuong", "Bo Gia",
-            "Thang Nam Ruc Ro", "Hoa Vang Tren Co Xanh", "Chi Muoi Ba", "De Hoi Tinh", "Kieu"
+            "Thang Nam Ruc Ro", "Hoa Vang Tren Co Xanh", "Chi Muoi Ba", "De Hoi Tinh", "Kieu",
+            "Tam Cam Chuyen Chua Ke", "Ve Si Sai Gon", "Chi Pheo Ngoai Truyen", "Song Song", "Rung Xanh",
+            "Bi Mat Tham Do", "Linh Duyen", "Ngoai Gio Lam", "Truy Sat", "So Do",
+            "Tam Biet Thang Gieng", "Nhung Thang Nam De Danh", "Song Cung Lich Su", "Anh Trai Yeu Quai", "Loi Nho",
+            "Sac Dep Ngan Can", "Tinh Yeu Va Tham Vong", "Tuoi Tre Bat Tan", "Lac Loi", "Doi Cua Ai",
+            "Ngoc Vien Dong", "Toi Thay Hoa Vang Tren Co Xanh", "Canh Sat Hoang Gia", "Toi La Me Bao Mau", "Dua Con Xua",
+            "Chuyen Tinh Lao Dai", "Nhung Chuyen Di Dinh Menh", "Ky An Duong Pho", "Hoa Binh", "Tinh Khuc Bach Dinh",
+            "Mo Cua Tinh Yeu", "Vo Ba", "Ho Chi Minh Va Nguoi", "Con Gai Thoi Chien", "Mot Lan Thoang Qua", "Song Moi",
+            "Dung Si Me O", "Long Lan", "Mai Mai Tinh Yeu", "Tro Ve", "Nguoi Tinh Mu"
         ],
         "English": [
             "The Shawshank Redemption", "Inception", "The Dark Knight", "Avatar", "Titanic",
-            "Forrest Gump", "The Godfather", "Gladiator", "Pulp Fiction", "The Matrix"
+            "Forrest Gump", "The Godfather", "Gladiator", "Pulp Fiction", "The Matrix",
+            "Interstellar", "The Prestige", "Fight Club", "The Green Mile", "The Lion King",
+            "Saving Private Ryan", "Schindler's List", "Jurassic Park", "The Avengers", "Iron Man",
+            "The Wolf of Wall Street", "Black Panther", "Toy Story", "Up", "Coco",
+            "Finding Nemo", "The Incredibles", "Frozen", "Shrek", "Aladdin",
+            "Harry Potter", "The Lord of the Rings", "Star Wars", "The Social Network", "Joker",
+            "Mad Max: Fury Road", "The Silence of the Lambs", "Se7en", "The Usual Suspects", "Goodfellas",
+            "Braveheart", "Inglourious Basterds", "Django Unchained", "Whiplash", "La La Land",
+            "A Beautiful Mind", "The Pursuit of Happyness", "Slumdog Millionaire", "The Pianist", "The Big Short"
         ],
         "French": [
             "Amelie", "La Haine", "Intouchables", "Les Choristes", "La La Land",
-            "Blue Is the Warmest Color", "The Artist", "A Prophet", "Delicatessen", "The Grand Illusion"
+            "Blue Is the Warmest Color", "The Artist", "A Prophet", "Delicatessen", "The Grand Illusion",
+            "Breathless", "The 400 Blows", "Cléo from 5 to 7", "The Diving Bell and the Butterfly", "Hiroshima Mon Amour",
+            "Portrait of a Lady on Fire", "La Vie en Rose", "The Chorus", "Cache", "Jules and Jim",
+            "The Past", "L.Atalante", "A Very Long Engagement", "The Class", "Tell No One",
+            "The Intouchables", "A Prophet", "The Lovers on the Bridge", "Rust and Bone", "Love Me If You Dare",
+            "Wild Reeds", "Read My Lips", "A Summer's Tale", "The King and the Mockingbird", "Last Year at Marienbad",
+            "Army of Shadows", "Jean de Florette", "Manon des Sources", "My Life as a Zucchini", "The Triplets of Belleville",
+            "La Femme Nikita", "A Town Called Panic", "Goodbye First Love", "On My Way", "The Beat That My Heart Skipped",
+            "The Beautiful Troublemaker", "The Lovers", "Under the Roofs of Paris", "Amour", "Rififi"
         ],
         "Spanish": [
             "Pan's Labyrinth", "Roma", "The Sea Inside", "The Motorcycle Diaries", "Volver",
-            "Talk to Her", "Biutiful", "The Secret in Their Eyes", "All About My Mother", "Open Your Eyes"
+            "Talk to Her", "Biutiful", "The Secret in Their Eyes", "All About My Mother", "Open Your Eyes",
+            "Pain and Glory", "Wild Tales", "The Platform", "Campeones", "The Invisible Guest",
+            "Even the Rain", "Julieta", "Women on the Verge of a Nervous Breakdown", "Marshland",
+            "Black Bread", "Truman", "Summer 1993", "The Last Suit", "The Flower of My Secret",
+            "Broken Embraces", "Butterfly's Tongue", "Lovers of the Arctic Circle", "Dark Blue Almost Black",
+            "The Orphanage", "Cell 211", "The Endless Trench", "The Lighthouse of the Orcas", "Y Tu Mama Tambien",
+            "Instructions Not Included", "Like Water for Chocolate", "Macario", "No One Writes to the Colonel",
+            "Cronos", "Amores Perros", "The Devil's Backbone", "The Crime of Father Amaro", "Burnt Money",
+            "Nine Queens", "Son of the Bride", "The Headless Woman", "XXY", "Wild Tales", "Zama"
         ],
         "German": [
             "Das Boot", "Good Bye Lenin!", "The Lives of Others", "Run Lola Run", "Downfall",
-            "Nowhere in Africa", "The Baader Meinhof Complex", "Wings of Desire", "Toni Erdmann", "Victoria"
+            "Nowhere in Africa", "The Baader Meinhof Complex", "Wings of Desire", "Toni Erdmann", "Victoria",
+            "The White Ribbon", "Phoenix", "Barbara", "Oh Boy", "Transit",
+            "Never Look Away", "The Counterfeiters", "Head-On", "The Edukators", "Soul Kitchen",
+            "The Wave", "We Are Young. We Are Strong.", "The Captain", "Alone in Berlin", "Rosenstrasse",
+            "The Nasty Girl", "Stalingrad", "A Coffee in Berlin", "Summer Storm", "In the Fade",
+            "Cloud Atlas", "Perfume", "The Experiment", "The Harmonists", "The Tin Drum",
+            "Rainer Werner Fassbinder", "Germany Year Zero", "Marlene", "The Marriage of Maria Braun",
+            "The Blue Angel", "Nosferatu", "Metropolis", "Triumph of the Will", "Wings of Desire",
+            "Fitzcarraldo", "Aguirre, the Wrath of God", "Stroszek", "Grizzly Man", "My Best Fiend"
         ],
         "Mandarin": [
             "Crouching Tiger Hidden Dragon", "Hero", "Raise the Red Lantern", "Farewell My Concubine", "Red Cliff",
-            "House of Flying Daggers", "Infernal Affairs", "Kung Fu Hustle", "The Grandmaster", "A Touch of Sin"
+            "House of Flying Daggers", "Infernal Affairs", "Kung Fu Hustle", "The Grandmaster", "A Touch of Sin",
+            "To Live", "Ip Man", "Shaolin Soccer", "City of Life and Death", "Still Life",
+            "A City Called Macau", "Crazy Rich Asians", "Ash Is Purest White", "Shadow", "Better Days",
+            "Song of the Phoenix", "Chungking Express", "In the Mood for Love", "2046", "Spring in a Small Town",
+            "Aftershock", "The Taking of Tiger Mountain", "Detective Chinatown", "Monster Hunt", "The Wandering Earth",
+            "Legend of the Demon Cat", "Ne Zha", "Hi Mom", "Leap", "Shock Wave 2",
+            "The Captain", "Operation Red Sea", "Wolf Warrior 2", "The Battle at Lake Changjin", "The Eight Hundred",
+            "Devils on the Doorstep", "Not One Less", "Blind Shaft", "The Blue Kite", "Red Sorghum"
         ],
         "Hindi": [
             "3 Idiots", "Dangal", "Lagaan", "Sholay", "Kabhi Khushi Kabhie Gham",
-            "Chak De India", "Baahubali", "PK", "Barfi!", "Bajrangi Bhaijaan"
+            "Chak De India", "Baahubali", "PK", "Barfi!", "Bajrangi Bhaijaan",
+            "Padmaavat", "Sanju", "Andhadhun", "Tumbbad", "Zindagi Na Milegi Dobara",
+            "Dilwale Dulhania Le Jayenge", "Swades", "Rang De Basanti", "Queen", "Gully Boy",
+            "Stree", "Article 15", "Kaabil", "Raazi", "Drishyam",
+            "Mimi", "The Lunchbox", "Piku", "Hindi Medium", "Newton",
+            "Talvar", "Sonu Ke Titu Ki Sweety", "Ludo", "Chhichhore", "Kabir Singh",
+            "Badhaai Ho", "Bhool Bhulaiyaa", "Race", "Dhoom", "Krrish",
+            "My Name Is Khan", "Don", "War", "Ek Tha Tiger", "Sultan"
         ]
     }
 
@@ -371,7 +430,7 @@ def generate_movies(n):
             "Language": language,
             "Rating": round(random.uniform(5.0, 9.9), 1),
             "Duration": random.randint(90, 180),  # Duration in minutes
-            "Release_Date": fake.date_between(start_date='-5y', end_date='today').strftime('%Y-%m-%d')
+            "Release_Date": fake.date_between(start_date='-3y', end_date='today').strftime('%Y-%m-%d')
         })
     return movies
 
@@ -400,20 +459,20 @@ def generate_movie_genres(movies, genres):
 
 
 # Example Usage
-users = generate_users(n=2000)
-movies = generate_movies(n=50)
+users = generate_users(n=50000)
+movies = generate_movies(n=300)
 genres = generate_genres()
 movie_genres = generate_movie_genres(movies, genres)
-theaters = generate_theaters(n=10)
+theaters = generate_theaters(n=100)
 rooms = generate_rooms(theaters)
 seat_types = generate_seat_types()
 seats = generate_seats(rooms, seat_types)
-showtimes = generate_showtimes(rooms, movies, n=300)
-vouchers = generate_vouchers(n=30)
-bookings = generate_bookings(users, showtimes, vouchers, n=15000)
-admins = generate_admins(n=20)
+showtimes = generate_showtimes(rooms, movies, n=180000)
+vouchers = generate_vouchers(n=1000)
+bookings = generate_bookings(users, showtimes, vouchers, n=1000000)
+admins = generate_admins(n=500)
 booking_seat = generate_booking_seat(bookings, seats)
-redemptions = generate_redemptions(users, vouchers, n=6000)
+redemptions = generate_redemptions(users, vouchers, n=30000)
 showtime_management = generate_showtime_management(admins, showtimes)
 movie_management = generate_movie_management(admins)
 voucher_management = generate_voucher_management(admins, vouchers)
