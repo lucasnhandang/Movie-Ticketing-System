@@ -1,0 +1,199 @@
+-- ============================================
+-- 1. Insert Procedures: Thêm dữ liệu
+-- ============================================
+
+-- Thêm một bộ phim mới
+CREATE OR REPLACE PROCEDURE InsertMovie(
+    IN input_movie_id INT,
+    IN input_title VARCHAR(100),
+    IN input_description TEXT,
+    IN input_language VARCHAR(10),
+    IN input_rating DECIMAL(2, 1),
+    IN input_duration INT,
+    IN input_release_date DATE
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    INSERT INTO Movie (Movie_id, Title, Description, Language, Rating, Duration, Release_Date)
+    VALUES (input_movie_id, input_title, input_description, input_language, input_rating, input_duration, input_release_date);
+END;
+$$;
+
+-- Thêm một bản ghi đổi quà vào Redemption
+CREATE OR REPLACE PROCEDURE InsertRedemption(
+    IN input_user_id INT,
+    IN input_voucher_id INT,
+    IN input_redeem_date TIMESTAMP,
+    IN input_status VARCHAR(10)
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    INSERT INTO Redemption (User_id, Voucher_id, Redeem_Date, Status)
+    VALUES (input_user_id, input_voucher_id, input_redeem_date, input_status);
+END;
+$$;
+
+-- Thêm một suất chiếu phim mới
+CREATE OR REPLACE PROCEDURE InsertShowtime(
+    IN input_showtime_id INT,
+    IN input_start_time TIME,
+    IN input_end_time TIME,
+    IN input_date DATE,
+    IN input_room_id INT,
+    IN input_movie_id INT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    INSERT INTO Showtime (Showtime_id, Start_Time, End_Time, Date, Room_id, Movie_id)
+    VALUES (input_showtime_id, input_start_time, input_end_time, input_date, input_room_id, input_movie_id);
+END;
+$$;
+
+-- Thêm một người dùng mới
+CREATE OR REPLACE PROCEDURE InsertUser(
+    IN input_user_id INT,
+    IN input_name VARCHAR(100),
+    IN input_email VARCHAR(100),
+    IN input_password VARCHAR(50),
+    IN input_phone VARCHAR(20),
+    IN input_address VARCHAR(200),
+    IN input_date_joined TIMESTAMP,
+    IN input_dob DATE,
+    IN input_loyalty_points INT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    INSERT INTO "User" (User_id, Name, Email, Password, Phone, Address, Date_Joined, Dob, Loyalty_Points)
+    VALUES (input_user_id, input_name, input_email, input_password, input_phone, input_address, input_date_joined, input_dob, input_loyalty_points);
+END;
+$$;
+
+-- Thêm một voucher mới
+CREATE OR REPLACE PROCEDURE InsertVoucher(
+    IN input_voucher_id INT,
+    IN input_description TEXT,
+    IN input_discount_percentage INT,
+    IN input_expiry_date TIMESTAMP,
+    IN input_points_required INT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    INSERT INTO Voucher (Voucher_id, Description, Discount_Percentage, Expiry_Date, Points_Required)
+    VALUES (input_voucher_id, input_description, input_discount_percentage, input_expiry_date, input_points_required);
+END;
+$$;
+
+
+-- ============================================
+-- 2. Update Procedures: Cập nhật dữ liệu
+-- ============================================
+
+-- Cập nhật thông tin bộ phim
+CREATE OR REPLACE PROCEDURE UpdateMovie(
+    IN input_movie_id INT,
+    IN input_title VARCHAR(100),
+    IN input_description TEXT,
+    IN input_language VARCHAR(10),
+    IN input_rating DECIMAL(2, 1),
+    IN input_duration INT,
+    IN input_release_date DATE
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    UPDATE Movie
+    SET Title = input_title,
+        Description = input_description,
+        Language = input_language,
+        Rating = input_rating,
+        Duration = input_duration,
+        Release_Date = input_release_date
+    WHERE Movie_id = input_movie_id;
+END;
+$$;
+
+-- Cập nhật thông tin đổi thưởng
+CREATE OR REPLACE PROCEDURE UpdateRedemption(
+    IN input_user_id INT,
+    IN input_voucher_id INT,
+    IN input_redeem_date TIMESTAMP,
+    IN input_status VARCHAR(10)
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    UPDATE Redemption
+    SET Redeem_Date = input_redeem_date,
+        Status = input_status
+    WHERE User_id = input_user_id
+    AND Voucher_id = input_voucher_id;
+END;
+$$;
+
+-- Cập nhật thông tin suất chiếu
+CREATE OR REPLACE PROCEDURE UpdateShowtime(
+    IN input_showtime_id INT,
+    IN input_start_time TIME,
+    IN input_end_time TIME,
+    IN input_date DATE,
+    IN input_room_id INT,
+    IN input_movie_id INT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    UPDATE Showtime
+    SET Start_Time = input_start_time,
+        End_Time = input_end_time,
+        Date = input_date,
+        Room_id = input_room_id,
+        Movie_id = input_movie_id
+    WHERE Showtime_id = input_showtime_id;
+END;
+$$;
+
+-- Cập nhật thông tin người dùng
+CREATE OR REPLACE PROCEDURE UpdateUser(
+    IN input_user_id INT,
+    IN input_name VARCHAR(100),
+    IN input_email VARCHAR(100),
+    IN input_password VARCHAR(50),
+    IN input_phone VARCHAR(20),
+    IN input_address VARCHAR(200),
+    IN input_date_joined TIMESTAMP,
+    IN input_dob DATE,
+    IN input_loyalty_points INT
+)
+LANGUAGE plpgsql AS $$ 
+BEGIN 
+UPDATE "User" 
+SET 	Name = input_name,
+ 	Email = input_email,
+ 	Password = input_password,
+ 	Phone = input_phone,
+ 	Address = input_address,
+ 	Date_Joined = input_date_joined,
+ 	Dob = input_dob,
+ 	Loyalty_Points = input_loyalty_points 
+WHERE User_id = input_user_id; 
+END; 
+$$;
+
+
+-- Cập nhật thông tin voucher 
+CREATE OR REPLACE PROCEDURE UpdateVoucher( 
+IN input_voucher_id INT,
+ 	IN input_description TEXT, 
+IN input_discount_percentage INT, 
+IN input_expiry_date TIMESTAMP, 
+IN input_points_required INT 
+) 
+LANGUAGE plpgsql AS $$ 
+BEGIN 
+UPDATE Voucher 
+SET 	Description = input_description, 
+Discount_Percentage = input_discount_percentage, 
+Expiry_Date = input_expiry_date, 
+Points_Required = input_points_required 
+WHERE Voucher_id = input_voucher_id; 
+END;
+$$;
+
+
