@@ -162,22 +162,31 @@ $$ LANGUAGE plpgsql;
 
 
 -- Cập nhật thông tin voucher 
-CREATE OR REPLACE PROCEDURE UpdateVoucher( 
-IN input_voucher_id INT,
- 	IN input_description TEXT, 
-IN input_discount_percentage INT, 
-IN input_expiry_date TIMESTAMP, 
-IN input_points_required INT 
-) 
-LANGUAGE plpgsql AS $$ 
-BEGIN 
-UPDATE Voucher 
-SET 	Description = input_description, 
-Discount_Percentage = input_discount_percentage, 
-Expiry_Date = input_expiry_date, 
-Points_Required = input_points_required 
-WHERE Voucher_id = input_voucher_id; 
+CREATE OR REPLACE PROCEDURE UpdateVoucher(
+    IN input_voucher_id INT,
+    IN input_description TEXT,
+    IN input_expiry_date TIMESTAMP,
+    IN input_points_required INT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    -- Kiểm tra xem Voucher_id có tồn tại không
+    IF NOT EXISTS (SELECT 1 FROM Voucher WHERE Voucher_id = input_voucher_id) THEN
+        RAISE EXCEPTION 'Voucher with ID % does not exist.', input_voucher_id;
+    END IF;
+
+    -- Cập nhật các trường Expiry_Date, Points_Required, và Description
+    UPDATE Voucher
+    SET 
+        Description = input_description,
+        Expiry_Date = input_expiry_date,
+        Points_Required = input_points_required
+    WHERE Voucher_id = input_voucher_id;
+
+    -- Hiển thị thông báo thành công
+    RAISE NOTICE 'Voucher with ID % updated successfully.', input_voucher_id;
 END;
 $$;
+
 
 
