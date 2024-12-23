@@ -88,7 +88,7 @@ CREATE OR REPLACE FUNCTION FindMoviesByTheater(input_theater_id INT)
 RETURNS TABLE(Movie_id INT, Title VARCHAR, Description TEXT, Language VARCHAR, Rating DECIMAL, Duration INT, Release_Date DATE) AS $$
 BEGIN
     RETURN QUERY
-    SELECT DISTINCT m.Movie_id, m.Title, m.Description, m.Language, m.Rating, m.Duration, m.Release_Date
+    SELECT DISTINCT m.*
     FROM Movie m
     JOIN Showtime s ON m.Movie_id = s.Movie_id
     JOIN Room r ON s.Room_id = r.Room_id
