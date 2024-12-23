@@ -3,11 +3,11 @@
 -- Bảng Theater (5 records)
 
 INSERT INTO Theater (Theater_id, Name, Address, City, Total_Rooms) VALUES
-(1, 'Galaxy Cinema Nguyễn Du', '116 Nguyễn Du, Quận 1', 'Ho Chi Minh', 8),
-(2, 'CGV Vincom Bà Triệu', '191 Bà Triệu, Hai Bà Trưng', 'Ha Noi', 10),
-(3, 'Lotte Cinema Đống Đa', '229 Tây Sơn, Đống Đa', 'Ha Noi', 7),
-(4, 'BHD Star Bitexco', 'Tầng 3, TTTM Icon 68, Quận 1', 'Ho Chi Minh', 5),
-(5, 'CineStar Quốc Thanh', '271 Nguyễn Trãi, Quận 1', 'Ho Chi Minh', 6);
+(1, 'Galaxy Cinema Nguyen Du', '116 Nguyen Du, Quan 1', 'Ho Chi Minh', 8),
+(2, 'CGV Vincom Ba Trieu', '191 Ba Trieu, Hai Ba Trung', 'Ha Noi', 10),
+(3, 'Lotte Cinema Dong Da', '229 Tay Son, Dong Da', 'Ha Noi', 7),
+(4, 'BHD Star Bitexco', 'Tang 3, TTTM Icon 68, Quan 1', 'Ho Chi Minh', 5),
+(5, 'CineStar Quoc Thanh', '271 Nguyen Trai, Quan 1', 'Ho Chi Minh', 6);
 
 -- Bảng Room (36 records = Tổng số room của tất cả cá rạp trong hệ thống, capacity = 80->150)
 
