@@ -129,45 +129,6 @@ BEGIN
 END;
 $$;
 
-
--- Cập nhật thông tin đổi thưởng
-CREATE OR REPLACE PROCEDURE UpdateRedemption(
-    IN input_user_id INT,
-    IN input_voucher_id INT,
-    IN input_redeem_date TIMESTAMP,
-    IN input_status VARCHAR(10)
-)
-LANGUAGE plpgsql AS $$
-BEGIN
-    UPDATE Redemption
-    SET Redeem_Date = input_redeem_date,
-        Status = input_status
-    WHERE User_id = input_user_id
-    AND Voucher_id = input_voucher_id;
-END;
-$$;
-
--- Cập nhật thông tin suất chiếu
-CREATE OR REPLACE PROCEDURE UpdateShowtime(
-    IN input_showtime_id INT,
-    IN input_start_time TIME,
-    IN input_end_time TIME,
-    IN input_date DATE,
-    IN input_room_id INT,
-    IN input_movie_id INT
-)
-LANGUAGE plpgsql AS $$
-BEGIN
-    UPDATE Showtime
-    SET Start_Time = input_start_time,
-        End_Time = input_end_time,
-        Date = input_date,
-        Room_id = input_room_id,
-        Movie_id = input_movie_id
-    WHERE Showtime_id = input_showtime_id;
-END;
-$$;
-
 -- Cập nhật thông tin người dùng
 CREATE OR REPLACE FUNCTION update_user_by_email(
     emails VARCHAR, 
@@ -198,7 +159,6 @@ BEGIN
     RAISE NOTICE 'User with email % has been updated successfully.', emails; 
 END;
 $$ LANGUAGE plpgsql;
-
 
 
 -- Cập nhật thông tin voucher 
