@@ -423,3 +423,61 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE PROCEDURE simulate_payment(
+    p_booking_id INT,
+    p_payment_status BOOLEAN -- TRUE for success, FALSE for failure
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_current_status VARCHAR(10);
+    v_user_id INT;
+    v_voucher_id INT;
+BEGIN
+    -- Validate booking exists and is in Pending status
+    SELECT 
+        b.Status,
+        b.User_id,
+        b.Voucher_id
+    INTO 
+        v_current_status,
+        v_user_id,
+        v_voucher_id
+    FROM Booking b
+    WHERE b.Booking_id = p_booking_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Booking not found';
+    END IF;
+
+    IF v_current_status != 'Pending' THEN
+        RAISE EXCEPTION 'Can only process payment for pending bookings. Current status: %', v_current_status;
+    END IF;
+
+    -- Start transaction
+    BEGIN
+        -- Simulate payment processing delay
+        PERFORM pg_sleep(1); -- Wait 1 second to simulate processing
+
+        IF p_payment_status THEN
+            -- Payment successful
+            CALL update_booking_status(
+                p_booking_id := p_booking_id,
+                p_new_status := 'Confirmed'
+            );
+        ELSE
+            -- Payment failed
+            CALL update_booking_status(
+                p_booking_id := p_booking_id,
+                p_new_status := 'Cancelled'
+            );
+        END IF;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            RAISE;
+    END;
+END;
+$$;
+
+
