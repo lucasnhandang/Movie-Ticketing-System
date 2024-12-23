@@ -325,6 +325,7 @@ INSERT INTO VoucherManagement (admin_id, voucher_id, manage_date, description) V
 DO $$
 DECLARE
     room RECORD;
+    showtime_id INT := 1;
     start_time TIME;
     end_time TIME;
     show_date DATE;
@@ -347,11 +348,14 @@ BEGIN
                 end_time := start_time + INTERVAL '2 hours';
                 
                 -- Tính Movie_id phân phối tuần tự
-                movie_index := (i + day_offset + room.Room_id - 1) % movie_count + 1;
+                movie_index := (showtime_id - 1) % movie_count + 1;
 
                 -- Thêm record vào bảng Showtime
-                INSERT INTO Showtime (Start_Time, End_Time, Date, Room_id, Movie_id)
-                VALUES (start_time, end_time, show_date, room.Room_id, movie_index);
+                INSERT INTO Showtime (Showtime_id, Start_Time, End_Time, Date, Room_id, Movie_id)
+                VALUES (showtime_id, start_time, end_time, show_date, room.Room_id, movie_index);
+
+                -- Tăng Showtime_id
+                showtime_id := showtime_id + 1;
             END LOOP;
         END LOOP;
     END LOOP;
