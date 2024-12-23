@@ -396,7 +396,7 @@ BEGIN
         user_id := (SELECT FLOOR(1 + (RANDOM() * 100))::INT);
         
         -- Chọn ngẫu nhiên showtime_id từ bảng Showtime
-        showtime_id := (SELECT FLOOR(1 + (RANDOM() * (SELECT COUNT(*) FROM Showtime)))::INT);
+        showtime_id := (SELECT FLOOR(1 + (RANDOM() * 20)));
         
         -- Chọn ngẫu nhiên số ghế từ 1 đến 5
         num_seats := (SELECT FLOOR(1 + (RANDOM() * 5))::INT);
