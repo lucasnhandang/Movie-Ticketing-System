@@ -4,7 +4,6 @@
 
 -- Thêm một bộ phim mới
 CREATE OR REPLACE PROCEDURE InsertMovie(
-    IN input_movie_id INT,
     IN input_title VARCHAR(100),
     IN input_description TEXT,
     IN input_language VARCHAR(10),
@@ -13,11 +12,21 @@ CREATE OR REPLACE PROCEDURE InsertMovie(
     IN input_release_date DATE
 )
 LANGUAGE plpgsql AS $$
+DECLARE
+    new_movie_id INT; -- Biến để lưu Movie_id mới
 BEGIN
+    -- Tính Movie_id mới bằng cách lấy giá trị cao nhất hiện tại + 1
+    SELECT COALESCE(MAX(Movie_id), 0) + 1 INTO new_movie_id FROM Movie;
+
+    -- Chèn dữ liệu vào bảng Movie
     INSERT INTO Movie (Movie_id, Title, Description, Language, Rating, Duration, Release_Date)
-    VALUES (input_movie_id, input_title, input_description, input_language, input_rating, input_duration, input_release_date);
+    VALUES (new_movie_id, input_title, input_description, input_language, input_rating, input_duration, input_release_date);
+
+    -- Hiển thị thông báo thành công
+    RAISE NOTICE 'Movie inserted with Movie_id: %', new_movie_id;
 END;
 $$;
+
 
 -- Thêm một bản ghi đổi quà vào Redemption
 CREATE OR REPLACE PROCEDURE InsertRedemption(
