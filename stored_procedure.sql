@@ -58,17 +58,17 @@ END;
 $$;
 
 -- Thêm một người dùng mới
-CREATE OR REPLACE FUNCTION insert_user(
-    name VARCHAR,
-    email VARCHAR,
-    password VARCHAR,
-    phone VARCHAR DEFAULT NULL,
-    address VARCHAR DEFAULT NULL,
-    date_joined TIMESTAMP DEFAULT NOW(),
-    dob DATE DEFAULT NULL,
-    loyalty_points INT DEFAULT 0
+CREATE OR REPLACE PROCEDURE insert_user(
+    IN name VARCHAR,
+    IN email VARCHAR,
+    IN password VARCHAR,
+    IN phone VARCHAR DEFAULT NULL,
+    IN address VARCHAR DEFAULT NULL,
+    IN date_joined TIMESTAMP DEFAULT NOW(),
+    IN dob DATE DEFAULT NULL,
+    IN loyalty_points INT DEFAULT 0
 )
-RETURNS VOID AS $$
+LANGUAGE plpgsql AS $$
 BEGIN
     -- Thêm người dùng mới vào bảng "User"
     INSERT INTO "User" (Name, Email, Password, Phone, Address, Date_Joined, Dob, Loyalty_Points)
@@ -77,7 +77,7 @@ BEGIN
     -- Hiển thị thông báo thành công
     RAISE NOTICE 'User % inserted successfully.', name;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 
 -- Thêm một voucher mới
