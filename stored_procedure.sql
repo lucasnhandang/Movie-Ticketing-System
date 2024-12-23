@@ -131,7 +131,7 @@ END;
 $$;
 
 -- Cập nhật thông tin người dùng
-CREATE OR REPLACE FUNCTION update_user_by_email(
+CREATE OR REPLACE PROCEDURE update_user_by_email(
     emails VARCHAR, 
     names VARCHAR DEFAULT NULL, 
     passwords VARCHAR DEFAULT NULL, 
@@ -139,7 +139,7 @@ CREATE OR REPLACE FUNCTION update_user_by_email(
     addresss VARCHAR DEFAULT NULL, 
     dobs DATE DEFAULT NULL 
 )
-RETURNS VOID AS $$
+LANGUAGE plpgsql AS $$
 BEGIN
     -- Kiểm tra xem email có tồn tại không
     IF NOT EXISTS (SELECT 1 FROM "User" u WHERE u.Email = emails) THEN 
@@ -159,7 +159,8 @@ BEGIN
     -- Hiển thị thông báo thành công (tuỳ chọn)
     RAISE NOTICE 'User with email % has been updated successfully.', emails; 
 END;
-$$ LANGUAGE plpgsql;
+$$;
+
 
 
 -- Cập nhật thông tin voucher 
