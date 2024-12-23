@@ -186,4 +186,70 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- 11. Tính tổng tiền tiêu theo khoảng thời gian dành cho User
+CREATE OR REPLACE FUNCTION CalculateTotalSpentByTime(
+    input_user_id INT, 
+    input_time_start DATE, 
+    input_time_end DATE
+)
+RETURNS DECIMAL AS $$
+DECLARE
+    total_spent DECIMAL := 0;
+BEGIN
+    -- Tính tổng tiền bỏ ra theo khoảng thời gian
+    SELECT SUM(stp.Price) INTO total_spent
+    FROM Booking b
+    JOIN BookingSeat bs ON b.Booking_id = bs.Booking_id
+    JOIN Seat s ON bs.Seat_id = s.Seat_id
+    JOIN SeatType stp ON s.Seattype_id = stp.Seattype_id
+    WHERE b.User_id = input_user_id
+    AND b.Time BETWEEN input_time_start AND input_time_end
+    AND b.Status = 'Confirmed'; -- Chỉ tính các booking đã xác nhận
+
+    RETURN total_spent;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 12. Tính tổng thời gian xem phim trong một khung thời gian dành cho User
+CREATE OR REPLACE FUNCTION CalculateTotalWatchTime(
+    input_user_id INT,
+    input_time_start DATE,
+    input_time_end DATE
+)
+RETURNS INTERVAL AS $$
+DECLARE
+    total_time INTERVAL := INTERVAL '0' MINUTE;
+BEGIN
+    SELECT SUM(m.Duration * 60) * INTERVAL '1 minute' INTO total_time
+    FROM Booking b
+    JOIN Showtime st ON b.Showtime_id = st.Showtime_id
+    JOIN Movie m ON st.Movie_id = m.Movie_id
+    WHERE b.User_id = input_user_id
+    AND b.Time BETWEEN input_time_start AND input_time_end
+    AND b.Status = 'Confirmed'; -- Chỉ tính các booking đã xác nhận
+
+    RETURN total_time;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 13. Tìm thể loại phim xem nhiều nhất dành cho User
+CREATE OR REPLACE FUNCTION FindMostWatchedGenreByUser(input_user_id INT)
+RETURNS TABLE(Genre_id INT, Genre_Name VARCHAR, Watch_Count BIGINT) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT g.Genre_id, g.Name AS Genre_Name, COUNT(*) AS Watch_Count
+    FROM Booking b
+    JOIN Showtime st ON b.Showtime_id = st.Showtime_id
+    JOIN Movie m ON st.Movie_id = m.Movie_id
+    JOIN MovieGenre mg ON m.Movie_id = mg.Movie_id
+    JOIN Genre g ON mg.Genre_id = g.Genre_id
+    WHERE b.User_id = input_user_id
+    AND b.Status = 'Confirmed'  -- Chỉ tính những booking đã xác nhận
+    GROUP BY g.Genre_id, g.Name
+    ORDER BY Watch_Count DESC  -- Sắp xếp theo số lần xem giảm dần
+    LIMIT 1;  -- Chỉ trả về genre xem nhiều nhất
+END;
+$$ LANGUAGE plpgsql;
+
+
 
