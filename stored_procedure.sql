@@ -50,23 +50,31 @@ END;
 $$;
 
 -- Thêm một người dùng mới
-CREATE OR REPLACE PROCEDURE InsertUser(
-    IN input_user_id INT,
-    IN input_name VARCHAR(100),
-    IN input_email VARCHAR(100),
-    IN input_password VARCHAR(50),
-    IN input_phone VARCHAR(20),
-    IN input_address VARCHAR(200),
-    IN input_date_joined TIMESTAMP,
-    IN input_dob DATE,
-    IN input_loyalty_points INT
+CREATE OR REPLACE FUNCTION insert_user(
+    name VARCHAR,
+    email VARCHAR,
+    password VARCHAR,
+    phone VARCHAR DEFAULT NULL,
+    address VARCHAR DEFAULT NULL,
+    date_joined TIMESTAMP DEFAULT NOW(),
+    dob DATE DEFAULT NULL,
+    loyalty_points INT DEFAULT 0
 )
-LANGUAGE plpgsql AS $$
+RETURNS VOID AS $$
+DECLARE
+    new_user_id INT; -- Biến để lưu User_id mới
 BEGIN
+    -- Tính User_id mới bằng cách lấy giá trị cao nhất hiện tại + 1
+    SELECT COALESCE(MAX(User_id), 0) + 1 INTO new_user_id FROM "User";
+
+    -- Chèn người dùng mới vào bảng User
     INSERT INTO "User" (User_id, Name, Email, Password, Phone, Address, Date_Joined, Dob, Loyalty_Points)
-    VALUES (input_user_id, input_name, input_email, input_password, input_phone, input_address, input_date_joined, input_dob, input_loyalty_points);
+    VALUES (new_user_id, name, email, password, phone, address, date_joined, dob, loyalty_points);
+
+    -- Hiển thị thông báo thành công (nếu cần kiểm tra log)
+    RAISE NOTICE 'User inserted with User_id: %', new_user_id;
 END;
-$$;
+$$ LANGUAGE plpgsql;
 
 -- Thêm một voucher mới
 CREATE OR REPLACE PROCEDURE InsertVoucher(
