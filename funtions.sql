@@ -125,17 +125,32 @@ $$ LANGUAGE plpgsql;
 -- ============================================
 -- 7. Function: Tìm ghế theo suất chiếu và trạng thái booking
 -- ============================================
-CREATE OR REPLACE FUNCTION FindSeatsByShowtimeAndBookingStatus(input_showtime_id INT)
-RETURNS TABLE(Seat_id INT, "Row" VARCHAR, "Number" INT, Seattype_id INT, Booking_Status VARCHAR) AS $$
+CREATE OR REPLACE FUNCTION FindAvailableSeatsByShowtime(input_showtime_id INT)
+RETURNS TABLE(
+    Seat_id INT, 
+    "Row" VARCHAR, 
+    "Number" INT, 
+    Seattype_id INT, 
+    Seattype_name VARCHAR, 
+    Price INT
+) AS $$
 BEGIN
     RETURN QUERY
-    SELECT s.Seat_id, s.Row, s.Number, s.Seattype_id, b.Status AS Booking_Status
+    SELECT 
+        s.Seat_id, 
+        s.Row, 
+        s.Number, 
+        s.Seattype_id, 
+        st.Name AS Seattype_name, 
+        st.Price
     FROM Seat s
+    JOIN SeatType st ON s.Seattype_id = st.Seattype_id
+    JOIN Room r ON s.Room_id = r.Room_id
+    JOIN Showtime stime ON r.Room_id = stime.Room_id
     LEFT JOIN BookingSeat bs ON s.Seat_id = bs.Seat_id
     LEFT JOIN Booking b ON bs.Booking_id = b.Booking_id
-    LEFT JOIN Showtime st ON b.Showtime_id = st.Showtime_id
-    WHERE st.Showtime_id = input_showtime_id
-    AND (b.Status NOT IN ('Confirmed', 'Pending') OR b.Status IS NULL);
+    WHERE stime.Showtime_id = input_showtime_id
+      AND (b.Status IS NULL OR b.Status NOT IN ('Confirmed', 'Pending'));
 END;
 $$ LANGUAGE plpgsql;
 
