@@ -84,6 +84,17 @@ $$ LANGUAGE plpgsql;
 -- ============================================
 -- 5. Function: Tìm các bộ phim trong một rạp
 -- ============================================
+--Tìm rạp
+CREATE OR REPLACE FUNCTION FindTheatersByName(input_theater_name VARCHAR)
+RETURNS TABLE(Theater_id INT, Name VARCHAR, Address VARCHAR, City VARCHAR) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT t.Theater_id, t.Name, t.Address, t.City
+    FROM Theater t
+    WHERE t.Name ILIKE '%' || input_theater_name || '%'; -- Tìm theo chuỗi nhập vào
+END;
+$$ LANGUAGE plpgsql;
+--Tìm phim trong rạp đó
 CREATE OR REPLACE FUNCTION FindMoviesByTheater(input_theater_id INT)
 RETURNS TABLE(Movie_id INT, Title VARCHAR, Description TEXT, Language VARCHAR, Rating DECIMAL, Duration INT, Release_Date DATE) AS $$
 BEGIN
