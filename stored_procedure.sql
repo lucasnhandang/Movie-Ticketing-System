@@ -188,5 +188,238 @@ BEGIN
 END;
 $$;
 
+-- ============================================
+-- 3. Payment Procedure
+-- ============================================
 
+-- Modify the book_tickets procedure
+CREATE OR REPLACE PROCEDURE book_tickets(
+    p_user_id INT,
+    p_showtime_id INT,
+    p_seat_ids INT[],
+    p_voucher_id INT DEFAULT NULL
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_booking_id INT;
+    v_seat_count INT;
+    v_locked_seat_count INT;
+BEGIN
+    -- Previous validation code remains the same
+    IF p_user_id IS NULL OR p_showtime_id IS NULL OR p_seat_ids IS NULL THEN
+        RAISE EXCEPTION 'Required parameters cannot be null';
+    END IF;
+
+    SELECT COUNT(*)
+    INTO v_seat_count
+    FROM Seat s
+    JOIN Showtime sh ON s.Room_id = sh.Room_id
+    WHERE s.Seat_id = ANY(p_seat_ids)
+    AND sh.Showtime_id = p_showtime_id;
+
+    IF v_seat_count != array_length(p_seat_ids, 1) THEN
+        RAISE EXCEPTION 'Invalid seats selected for this showtime';
+    END IF;
+
+    BEGIN
+        -- Lock and verify selected seats are available
+        WITH LockedSeats AS (
+            SELECT Seat_id
+            FROM Seat
+            WHERE Seat_id = ANY(p_seat_ids)
+            AND Seat_id NOT IN (
+                SELECT bs.Seat_id
+                FROM BookingSeat bs
+                JOIN Booking b ON bs.Booking_id = b.Booking_id
+                WHERE b.Showtime_id = p_showtime_id
+                AND b.Status != 'Cancelled'
+            )
+            FOR UPDATE
+        )
+        SELECT COUNT(*)
+        INTO v_locked_seat_count
+        FROM LockedSeats;
+
+        IF v_locked_seat_count != array_length(p_seat_ids, 1) THEN
+            RAISE EXCEPTION 'Some selected seats are already booked';
+        END IF;
+
+        -- Create booking record
+        INSERT INTO Booking (
+            Time,
+            Status,
+            User_id,
+            Showtime_id,
+            Voucher_id
+        )
+        VALUES (
+            CURRENT_TIMESTAMP,
+            'Pending',
+            p_user_id,
+            p_showtime_id,
+            p_voucher_id
+        )
+        RETURNING Booking_id INTO v_booking_id;
+
+        -- Link seats to booking
+        INSERT INTO BookingSeat (Booking_id, Seat_id)
+        SELECT v_booking_id, unnest(p_seat_ids);
+
+        -- Voucher validation and processing remains the same
+        IF p_voucher_id IS NOT NULL THEN
+            IF NOT EXISTS (
+                SELECT 1
+                FROM Redemption
+                WHERE User_id = p_user_id
+                AND Voucher_id = p_voucher_id
+                AND Status = 'Available'
+                AND CURRENT_TIMESTAMP <= (
+                    SELECT Expiry_Date
+                    FROM Voucher
+                    WHERE Voucher_id = p_voucher_id
+                )
+            ) THEN
+                RAISE EXCEPTION 'Invalid or expired voucher';
+            END IF;
+
+            UPDATE Redemption
+            SET Status = 'Used',
+                Redeem_Date = CURRENT_TIMESTAMP
+            WHERE User_id = p_user_id
+            AND Voucher_id = p_voucher_id;
+        END IF;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            RAISE;
+    END;
+END;
+$$;
+
+-- Modify the update_booking_status procedure
+CREATE OR REPLACE PROCEDURE update_booking_status(
+    p_booking_id INT,
+    p_new_status VARCHAR(10),
+    p_admin_id INT DEFAULT NULL
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_current_status VARCHAR(10);
+    v_user_id INT;
+    v_voucher_id INT;
+    v_loyalty_points INT;
+    v_total_amount DECIMAL;
+BEGIN
+    -- Previous validation code remains the same
+    IF p_booking_id IS NULL OR p_new_status IS NULL THEN
+        RAISE EXCEPTION 'Required parameters cannot be null';
+    END IF;
+
+    IF p_new_status NOT IN ('Confirmed', 'Cancelled') THEN
+        RAISE EXCEPTION 'Invalid status. Must be either Confirmed or Cancelled';
+    END IF;
+
+    SELECT 
+        b.Status,
+        b.User_id,
+        b.Voucher_id
+    INTO 
+        v_current_status,
+        v_user_id,
+        v_voucher_id
+    FROM Booking b
+    WHERE b.Booking_id = p_booking_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Booking not found';
+    END IF;
+
+    IF v_current_status = p_new_status THEN
+        RAISE EXCEPTION 'Booking is already in % status', p_new_status;
+    END IF;
+
+    IF v_current_status = 'Cancelled' THEN
+        RAISE EXCEPTION 'Cannot update cancelled booking';
+    END IF;
+
+    BEGIN
+        -- Update booking status
+        UPDATE Booking
+        SET Status = p_new_status,
+            Time = CURRENT_TIMESTAMP
+        WHERE Booking_id = p_booking_id;
+
+        -- Handle voucher based on new status
+        IF v_voucher_id IS NOT NULL THEN
+            IF p_new_status = 'Cancelled' THEN
+                UPDATE Redemption
+                SET Status = 'Available',
+                    Redeem_Date = NULL
+                WHERE User_id = v_user_id
+                AND Voucher_id = v_voucher_id;
+            END IF;
+        END IF;
+
+        -- Modified loyalty points calculation (5% of total amount)
+        IF p_new_status = 'Confirmed' THEN
+            -- Calculate total amount spent
+            SELECT SUM(st.Price)
+            INTO v_total_amount
+            FROM BookingSeat bs
+            JOIN Seat s ON bs.Seat_id = s.Seat_id
+            JOIN SeatType st ON s.Seattype_id = st.Seattype_id
+            WHERE bs.Booking_id = p_booking_id;
+
+            -- Calculate loyalty points (5% of total amount)
+            v_loyalty_points := FLOOR(v_total_amount * 0.05);
+
+            -- Add loyalty points
+            UPDATE "User"
+            SET Loyalty_Points = Loyalty_Points + v_loyalty_points
+            WHERE User_id = v_user_id;
+            
+        ELSIF p_new_status = 'Cancelled' THEN
+            -- If booking was previously confirmed, subtract loyalty points
+            IF v_current_status = 'Confirmed' THEN
+                SELECT SUM(st.Price)
+                INTO v_total_amount
+                FROM BookingSeat bs
+                JOIN Seat s ON bs.Seat_id = s.Seat_id
+                JOIN SeatType st ON s.Seattype_id = st.Seattype_id
+                WHERE bs.Booking_id = p_booking_id;
+
+                v_loyalty_points := FLOOR(v_total_amount * 0.05);
+
+                UPDATE "User"
+                SET Loyalty_Points = GREATEST(0, Loyalty_Points - v_loyalty_points)
+                WHERE User_id = v_user_id;
+            END IF;
+        END IF;
+
+        -- Log the status change if admin_id is provided
+        IF p_admin_id IS NOT NULL THEN
+            INSERT INTO BookingStatusLog (
+                Booking_id,
+                Admin_id,
+                Old_Status,
+                New_Status,
+                Change_Time
+            )
+            VALUES (
+                p_booking_id,
+                p_admin_id,
+                v_current_status,
+                p_new_status,
+                CURRENT_TIMESTAMP
+            );
+        END IF;
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            RAISE;
+    END;
+END;
+$$;
 
