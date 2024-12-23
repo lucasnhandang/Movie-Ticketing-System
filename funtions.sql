@@ -172,17 +172,36 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ============================================
--- 10. Function: Tìm voucher theo ngày và trạng thái đổi thưởng
+-- 10. Function: Tìm voucher khả dụng (cre: Nhi)
 -- ============================================
-CREATE OR REPLACE FUNCTION FindVouchersByDateAndRedemptionStatus(input_date DATE, input_redemption_status VARCHAR)
-RETURNS TABLE(Voucher_id INT, Description TEXT, Discount_Percentage INT, Expiry_Date TIMESTAMP, Redemption_Status VARCHAR) AS $$
+CREATE OR REPLACE FUNCTION update_expired_vouchers()
+RETURNS VOID AS $$
 BEGIN
+    -- Cập nhật trạng thái trong bảng Redemption thành 'Expired' nếu voucher hết hạn
+    UPDATE Redemption
+    SET Status = 'Expired'
+    WHERE Voucher_id IN (
+        SELECT Voucher_id
+        FROM Voucher
+        WHERE Expiry_Date < NOW()
+    );
+
+    -- Thông báo nếu cần kiểm tra log
+    RAISE NOTICE 'Expired vouchers have been updated in Redemption.';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION view_redemption_vouchers(userid INT) 
+RETURNS TABLE (Voucher_id INT, Status VARCHAR, Redeem_Date TIMESTAMP) AS $$
+BEGIN
+    -- Cập nhật trạng thái của các voucher hết hạn
+    PERFORM update_expired_vouchers();
+
+    -- Trả về danh sách các voucher đã đổi
     RETURN QUERY
-    SELECT v.Voucher_id, v.Description, v.Discount_Percentage, v.Expiry_Date, r.Status AS Redemption_Status
-    FROM Voucher v
-    JOIN Redemption r ON v.Voucher_id = r.Voucher_id
-    WHERE v.Expiry_Date > input_date
-    AND r.Status = input_redemption_status;
+    SELECT r.Voucher_id, r.Status, r.Redeem_Date
+    FROM Redemption r
+    WHERE r.User_id = userid; 
 END;
 $$ LANGUAGE plpgsql;
 
