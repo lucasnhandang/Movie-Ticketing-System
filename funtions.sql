@@ -114,19 +114,20 @@ $$ LANGUAGE plpgsql;
 -- ============================================
 -- 7. Function: Tìm ghế theo suất chiếu và trạng thái booking
 -- ============================================
-CREATE OR REPLACE FUNCTION FindSeatsByShowtimeAndBookingStatus(input_showtime_id INT, input_booking_status VARCHAR)
+CREATE OR REPLACE FUNCTION FindSeatsByShowtimeAndBookingStatus(input_showtime_id INT)
 RETURNS TABLE(Seat_id INT, "Row" VARCHAR, "Number" INT, Seattype_id INT, Booking_Status VARCHAR) AS $$
 BEGIN
     RETURN QUERY
     SELECT s.Seat_id, s.Row, s.Number, s.Seattype_id, b.Status AS Booking_Status
     FROM Seat s
-    JOIN BookingSeat bs ON s.Seat_id = bs.Seat_id
-    JOIN Booking b ON bs.Booking_id = b.Booking_id
-    JOIN Showtime st ON b.Showtime_id = st.Showtime_id
+    LEFT JOIN BookingSeat bs ON s.Seat_id = bs.Seat_id
+    LEFT JOIN Booking b ON bs.Booking_id = b.Booking_id
+    LEFT JOIN Showtime st ON b.Showtime_id = st.Showtime_id
     WHERE st.Showtime_id = input_showtime_id
-    AND b.Status = input_booking_status;
+    AND (b.Status NOT IN ('Confirmed', 'Pending') OR b.Status IS NULL);
 END;
 $$ LANGUAGE plpgsql;
+
 
 -- ============================================
 -- 8. Function: Tìm suất chiếu theo phim và rạp
