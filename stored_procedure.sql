@@ -28,13 +28,17 @@ $$;
 -- Thêm một bản ghi đổi quà vào Redemption
 CREATE OR REPLACE PROCEDURE InsertRedemption(
     IN input_user_id INT,
-    IN input_voucher_id INT,
-    IN input_redeem_date  TIMESTAMPTZ
+    IN input_voucher_id INT
 )
 LANGUAGE plpgsql AS $$
 BEGIN
+    -- Chèn bản ghi mới vào bảng Redemption (sẽ kích hoạt trigger)
     INSERT INTO Redemption (User_id, Voucher_id, Redeem_Date, Status)
-    VALUES (input_user_id, input_voucher_id, input_redeem_date, 'Available');
+    VALUES (input_user_id, input_voucher_id, NOW(), 'Available');
+
+    -- Thông báo sau khi thêm thành công
+    RAISE NOTICE 'Redemption record inserted for User_id % and Voucher_id %. Trigger will handle point deduction.', 
+        input_user_id, input_voucher_id;
 END;
 $$;
 
