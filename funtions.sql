@@ -231,7 +231,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- ============================================
 -- 11. Tính tổng tiền tiêu theo khoảng thời gian dành cho User
+-- ============================================
+
 CREATE OR REPLACE FUNCTION CalculateTotalSpentByTime(
     input_user_id INT, 
     input_time_start DATE, 
@@ -255,7 +258,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- ============================================
 -- 12. Tính tổng thời gian xem phim trong một khung thời gian dành cho User
+-- ============================================
+
 CREATE OR REPLACE FUNCTION CalculateTotalWatchTime(
     input_user_id INT,
     input_time_start DATE,
@@ -277,7 +283,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- ============================================
 -- 13. Tìm thể loại phim xem nhiều nhất dành cho User
+-- ============================================
+
 CREATE OR REPLACE FUNCTION FindMostWatchedGenreByUser(input_user_id INT)
 RETURNS TABLE(Genre_id INT, Genre_Name VARCHAR, Watch_Count BIGINT) AS $$
 BEGIN
