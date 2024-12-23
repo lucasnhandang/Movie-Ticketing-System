@@ -101,7 +101,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_update_loyalty_points_with_function
-AFTER INSERT OR UPDATE ON Booking
+AFTER UPDATE ON Booking
 FOR EACH ROW
 WHEN (NEW.Status = 'Confirmed' AND OLD.Status != 'Confirmed') -- Chỉ chạy khi trạng thái chuyển thành "Confirmed"
 EXECUTE FUNCTION update_loyalty_points_with_function();
