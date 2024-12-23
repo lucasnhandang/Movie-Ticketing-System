@@ -345,22 +345,33 @@ DECLARE
     start_time TIME;
     end_time TIME;
     show_date DATE;
+    movie_count INT;  -- Số lượng phim
+    movie_index INT;  -- Chỉ số để chọn Movie_id
 BEGIN
+    -- Đếm số lượng phim trong bảng Movie
+    SELECT COUNT(*) INTO movie_count FROM Movie;
+    
     -- Lặp qua từng phòng trong bảng Room
     FOR room IN SELECT Room_id FROM Room LOOP
         -- Lặp qua 5 ngày
         FOR day_offset IN 1..5 LOOP
             show_date := CURRENT_DATE + day_offset;  -- Tính ngày bắt đầu từ ngày hiện tại
+            
             -- Lặp qua 3 showtime trong 1 ngày
             FOR i IN 1..3 LOOP
                 -- Tính thời gian bắt đầu và kết thúc showtime
                 start_time := TIME '10:00' + (i - 1) * INTERVAL '3 hours';
-                end_time := start_time + INTERVAL '2 hour';
+                end_time := start_time + INTERVAL '2 hours';
                 
+                -- Tính Movie_id phân phối tuần tự
+                movie_index := (showtime_id - 1) % movie_count + 1;
+
                 -- Thêm record vào bảng Showtime
                 INSERT INTO Showtime (Showtime_id, Start_Time, End_Time, Date, Room_id, Movie_id)
-                VALUES (showtime_id, start_time, end_time, show_date, room.Room_id, 1);  -- Movie_id = 1 là ví dụ
-                showtime_id := showtime_id + 1;  -- Tăng Showtime_id
+                VALUES (showtime_id, start_time, end_time, show_date, room.Room_id, movie_index);
+
+                -- Tăng Showtime_id
+                showtime_id := showtime_id + 1;
             END LOOP;
         END LOOP;
     END LOOP;
