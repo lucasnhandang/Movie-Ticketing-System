@@ -13,20 +13,17 @@ CREATE OR REPLACE PROCEDURE InsertMovie(
 )
 LANGUAGE plpgsql AS $$
 DECLARE
-    new_movie_id INT; -- Biến để lưu Movie_id mới
+    new_movie_id INT; -- Biến để lưu Movie_id mới được tạo
 BEGIN
-    -- Tính Movie_id mới bằng cách lấy giá trị cao nhất hiện tại + 1
-    SELECT COALESCE(MAX(Movie_id), 0) + 1 INTO new_movie_id FROM Movie;
-
-    -- Chèn dữ liệu vào bảng Movie
-    INSERT INTO Movie (Movie_id, Title, Description, Language, Rating, Duration, Release_Date)
-    VALUES (new_movie_id, input_title, input_description, input_language, input_rating, input_duration, input_release_date);
+    -- Chèn dữ liệu vào bảng Movie, Movie_id sẽ được tự động tạo
+    INSERT INTO Movie (Title, Description, Language, Rating, Duration, Release_Date)
+    VALUES (input_title, input_description, input_language, input_rating, input_duration, input_release_date)
+    RETURNING Movie_id INTO new_movie_id; -- Lấy Movie_id vừa được tạo
 
     -- Hiển thị thông báo thành công
     RAISE NOTICE 'Movie inserted with Movie_id: %', new_movie_id;
 END;
 $$;
-
 
 -- Thêm một bản ghi đổi quà vào Redemption
 CREATE OR REPLACE PROCEDURE InsertRedemption(
@@ -70,35 +67,38 @@ CREATE OR REPLACE FUNCTION insert_user(
     loyalty_points INT DEFAULT 0
 )
 RETURNS VOID AS $$
-DECLARE
-    new_user_id INT; -- Biến để lưu User_id mới
 BEGIN
-    -- Tính User_id mới bằng cách lấy giá trị cao nhất hiện tại + 1
-    SELECT COALESCE(MAX(User_id), 0) + 1 INTO new_user_id FROM "User";
+    -- Thêm người dùng mới vào bảng "User"
+    INSERT INTO "User" (Name, Email, Password, Phone, Address, Date_Joined, Dob, Loyalty_Points)
+    VALUES (name, email, password, phone, address, date_joined, dob, loyalty_points);
 
-    -- Chèn người dùng mới vào bảng User
-    INSERT INTO "User" (User_id, Name, Email, Password, Phone, Address, Date_Joined, Dob, Loyalty_Points)
-    VALUES (new_user_id, name, email, password, phone, address, date_joined, dob, loyalty_points);
-
-    -- Hiển thị thông báo thành công (nếu cần kiểm tra log)
-    RAISE NOTICE 'User inserted with User_id: %', new_user_id;
+    -- Hiển thị thông báo thành công
+    RAISE NOTICE 'User % inserted successfully.', name;
 END;
 $$ LANGUAGE plpgsql;
 
+
 -- Thêm một voucher mới
 CREATE OR REPLACE PROCEDURE InsertVoucher(
-    IN input_voucher_id INT,
     IN input_description TEXT,
     IN input_discount_percentage INT,
     IN input_expiry_date TIMESTAMP,
     IN input_points_required INT
 )
 LANGUAGE plpgsql AS $$
+DECLARE
+    new_voucher_id INT; -- Biến để lưu Voucher_id mới được tạo
 BEGIN
-    INSERT INTO Voucher (Voucher_id, Description, Discount_Percentage, Expiry_Date, Points_Required)
-    VALUES (input_voucher_id, input_description, input_discount_percentage, input_expiry_date, input_points_required);
+    -- Chèn dữ liệu vào bảng Voucher, Voucher_id sẽ được tự động tạo
+    INSERT INTO Voucher (Description, Discount_Percentage, Expiry_Date, Points_Required)
+    VALUES (input_description, input_discount_percentage, input_expiry_date, input_points_required)
+    RETURNING Voucher_id INTO new_voucher_id; -- Lấy Voucher_id vừa được tạo
+
+    -- Hiển thị thông báo thành công
+    RAISE NOTICE 'Voucher inserted with Voucher_id: %', new_voucher_id;
 END;
 $$;
+
 
 
 -- ============================================
