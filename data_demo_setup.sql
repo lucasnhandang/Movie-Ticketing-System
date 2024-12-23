@@ -1,70 +1,64 @@
--- DATA demo
+-- Theater table
+INSERT INTO Theater (Name, Address, City, Total_Rooms) VALUES
+( 'Galaxy Cinema Nguyen Du', '116 Nguyen Du, Quan 1', 'Ho Chi Minh', 8),
+( 'CGV Vincom Ba Trieu', '191 Ba Trieu, Hai Ba Trung', 'Ha Noi', 10),
+( 'Lotte Cinema Dong Da', '229 Tay Son, Dong Da', 'Ha Noi', 7),
+( 'BHD Star Bitexco', 'Tang 3, TTTM Icon 68, Quan 1', 'Ho Chi Minh', 5),
+( 'CineStar Quoc Thanh', '271 Nguyen Trai, Quan 1', 'Ho Chi Minh', 6);
 
--- Bảng Theater (5 records)
+-- Room table
+INSERT INTO Room (Name, Capacity, Theater_id) VALUES
+('Room 1', 150, 1),
+('Room 2', 120, 1),
+('Room 3', 100, 1),
+('Room 4', 90, 1),
+('Room 5', 80, 1),
+('Room 6', 100, 1),
+('Room 7', 150, 1),
+('Room 8', 120, 1),
 
-INSERT INTO Theater (Theater_id, Name, Address, City, Total_Rooms) VALUES
-(1, 'Galaxy Cinema Nguyen Du', '116 Nguyen Du, Quan 1', 'Ho Chi Minh', 8),
-(2, 'CGV Vincom Ba Trieu', '191 Ba Trieu, Hai Ba Trung', 'Ha Noi', 10),
-(3, 'Lotte Cinema Dong Da', '229 Tay Son, Dong Da', 'Ha Noi', 7),
-(4, 'BHD Star Bitexco', 'Tang 3, TTTM Icon 68, Quan 1', 'Ho Chi Minh', 5),
-(5, 'CineStar Quoc Thanh', '271 Nguyen Trai, Quan 1', 'Ho Chi Minh', 6);
+('Room 1', 100, 2),
+('Room 2', 150, 2),
+('Room 3', 150, 2),
+('Room 4', 120, 2),
+('Room 5', 100, 2),
+('Room 6', 90, 2),
+('Room 7', 140, 2),
+('Room 8', 150, 2),
+('Room 9', 130, 2),
+('Room 10', 110, 2),
 
--- Bảng Room (36 records = Tổng số room của tất cả cá rạp trong hệ thống, capacity = 80->150)
+('Room 1', 120, 3),
+('Room 2', 100, 3),
+('Room 3', 150, 3),
+('Room 4', 100, 3),
+('Room 5', 180, 3),
+('Room 6', 90, 3),
+('Room 7', 130, 3),
 
-INSERT INTO Room (Room_id, Name, Capacity, Theater_id) VALUES
-(1, 'Room 1', 150, 1),
-(2, 'Room 2', 120, 1),
-(3, 'Room 3', 100, 1),
-(4, 'Room 4', 90, 1),
-(5, 'Room 5', 80, 1),
-(6, 'Room 6', 100, 1),
-(7, 'Room 7', 150, 1),
-(8, 'Room 8', 120, 1),
+('Room 1', 100, 4),
+('Room 2', 120, 4),
+('Room 3', 150, 4),
+('Room 4', 80, 4),
+('Room 5', 80, 4),
 
-(9, 'Room 1', 100, 2),
-(10, 'Room 2', 150, 2),
-(11, 'Room 3', 150, 2),
-(12, 'Room 4', 120, 2),
-(13, 'Room 5', 100, 2),
-(14, 'Room 6', 90, 2),
-(15, 'Room 7', 140, 2),
-(16, 'Room 8', 150, 2),
-(17, 'Room 9', 130, 2),
-(18, 'Room 10', 110, 2),
+('Room 1', 90, 5),
+('Room 2', 110, 5),
+('Room 3', 120, 5),
+('Room 4', 100, 5),
+('Room 5', 150, 5),
+('Room 6', 80, 5);
 
-(19, 'Room 1', 120, 3),
-(20, 'Room 2', 100, 3),
-(21, 'Room 3', 150, 3),
-(22, 'Room 4', 100, 3),
-(23, 'Room 5', 180, 3),
-(24, 'Room 6', 90, 3),
-(25, 'Room 7', 130, 3),
+-- SeatType Table
+INSERT INTO SeatType (Name, Price) VALUES
+('Standard', 100000), -- Ghế tiêu chuẩn
+('VIP', 200000),      -- Ghế VIP
+('Couple', 300000);   -- Ghế đôi
 
-(26, 'Room 1', 100, 4),
-(27, 'Room 2', 120, 4),
-(28, 'Room 3', 150, 4),
-(29, 'Room 4', 80, 4),
-(30, 'Room 5', 80, 4),
-
-(31, 'Room 1', 90, 5),
-(32, 'Room 2', 110, 5),
-(33, 'Room 3', 120, 5),
-(34, 'Room 4', 100, 5),
-(35, 'Room 5', 150, 5),
-(36, 'Room 6', 80, 5);
-
---Bảng SeatType (3 records)
-
-INSERT INTO SeatType (Seattype_id, Name, Price) VALUES
-(1, 'Standard', 100000), -- Ghế tiêu chuẩn
-(2, 'VIP', 200000),      -- Ghế VIP
-(3, 'Couple', 300000);   -- Ghế đôi
-
--- Bảng Seat (4220 records = tổng số seat của các room, 3 ghế đầu là hạng standard, ghế cuối là hạng Couple, còn lại là VIP)
+-- Seat Table
 DO $$
 DECLARE
     room RECORD;
-    seat_id INT := 1;
     row_letter CHAR := 'A';
     seat_number INT;
     seattype_id INT;
@@ -87,11 +81,10 @@ BEGIN
                 seattype_id := 2; -- VIP (các hàng còn lại)
             END IF;
 
-            INSERT INTO Seat (Seat_id, Row, Number, Seattype_id, Room_id)
-            VALUES (seat_id, row_letter, seat_number, seattype_id, room.Room_id);
+            INSERT INTO Seat (Row, Number, Seattype_id, Room_id)
+            VALUES (row_letter, seat_number, seattype_id, room.Room_id);
 
             -- Tăng Seat_id và số ghế
-            seat_id := seat_id + 1;
             seat_number := seat_number + 1;
 
             -- Reset hàng khi số ghế vượt quá 20
@@ -106,24 +99,22 @@ BEGIN
     END LOOP;
 END $$;
 
--- Bảng voucher (10 records)
-INSERT INTO Voucher (Voucher_id, Description, Discount_Percentage, Expiry_Date, Points_Required) VALUES
-(1, '10% discount', 10, '2025-01-31 23:59:59', 100),
-(2, '20% discount', 20, '2025-03-31 23:59:59', 200),
-(3, '30% discount', 30, '2024-11-30 23:59:59', 300),
-(4, '40% discount', 40, '2024-09-30 23:59:59', 400),
-(5, '50% discount', 50, '2025-12-31 23:59:59', 500),
-(6, '60% discount', 60, '2025-05-31 23:59:59', 600),
-(7, '70% discount', 70, '2025-04-30 23:59:59', 700),
-(8, '80% discount', 80, '2025-07-31 23:59:59', 800),
-(9, '90% discount', 90, '2025-08-31 23:59:59', 900),
-(10, '100% discount', 100, '2025-10-31 23:59:59', 1000);
+-- Voucher table
+INSERT INTO Voucher (Description, Discount_Percentage, Expiry_Date, Points_Required) VALUES
+('10% discount', 10, '2025-01-31 23:59:59', 100),
+('20% discount', 20, '2025-03-31 23:59:59', 200),
+('30% discount', 30, '2024-11-30 23:59:59', 300),
+('40% discount', 40, '2024-09-30 23:59:59', 400),
+('50% discount', 50, '2025-12-31 23:59:59', 500),
+('60% discount', 60, '2025-05-31 23:59:59', 600),
+('70% discount', 70, '2025-04-30 23:59:59', 700),
+('80% discount', 80, '2025-07-31 23:59:59', 800),
+('90% discount', 90, '2025-08-31 23:59:59', 900),
+('100% discount', 100, '2025-10-31 23:59:59', 1000);
 
--- Bảng User (100 users)
-
+-- User table
 DO $$
 DECLARE
-    user_id INT := 1;
     name VARCHAR(100);
     email VARCHAR(100);
     password VARCHAR(50);
@@ -135,9 +126,9 @@ DECLARE
 BEGIN
     FOR i IN 1..100 LOOP
         -- Generate random data
-        name := 'User_' || user_id;
-        email := 'user_' || user_id || '@example.com';
-        password := 'password' || user_id;
+        name := 'User_' || i;
+        email := 'user_' || i || '@example.com';
+        password := 'password' || i;
         phone := '0' || (1000000000 + FLOOR(RANDOM() * 9000000000)::BIGINT);
         address := 'Street ' || FLOOR(RANDOM() * 100)::TEXT || ', City ' || FLOOR(RANDOM() * 50)::TEXT;
         date_joined := '2023-01-01 00:00:00'::TIMESTAMP + (RANDOM() * INTERVAL '365 days');
@@ -145,63 +136,59 @@ BEGIN
         loyalty_points := FLOOR(RANDOM() * 501)::INT; -- Points between 0 and 500
         
         -- Insert data
-        INSERT INTO "User" (User_id, Name, Email, Password, Phone, Address, Date_Joined, Dob, Loyalty_Points)
-        VALUES (user_id, name, email, password, phone, address, date_joined, dob, loyalty_points);
+        INSERT INTO "User" (Name, Email, Password, Phone, Address, Date_Joined, Dob, Loyalty_Points)
+        VALUES (name, email, password, phone, address, date_joined, dob, loyalty_points);
         
-        -- Increment user_id
-        user_id := user_id + 1;
     END LOOP;
 END $$;
 
--- Bảng Admin (20 records)
+-- Admin table
+INSERT INTO Admin (Name, Email, Password, Phone, Dob) VALUES
+('Admin_John Doe', 'admin_johndoe@example.com', 'adminpass123', '0912345678', '1985-04-15'),
+('Admin_Jane Smith', 'admin_janesmith@example.com', 'adminpass456', '0923456789', '1990-06-20'),
+('Admin_Michael Johnson', 'admin_michaelj@example.com', 'adminpass789', '0934567890', '1987-09-12'),
+('Admin_Emily Davis', 'admin_emilyd@example.com', 'adminpass012', '0945678901', '1992-01-25'),
+('Admin_William Brown', 'admin_williamb@example.com', 'adminpass345', '0956789012', '1980-03-05'),
+('Admin_Olivia Wilson', 'admin_oliviaw@example.com', 'adminpass678', '0967890123', '1995-08-19'),
+('Admin_James Martinez', 'admin_jamesm@example.com', 'adminpass901', '0978901234', '1989-11-03'),
+('Admin_Sophia Anderson', 'admin_sophiaa@example.com', 'adminpass234', '0989012345', '1993-05-14'),
+('Admin_Benjamin Clark', 'admin_benjaminc@example.com', 'adminpass567', '0990123456', '1984-07-22'),
+('Admin_Ava Hernandez', 'admin_avah@example.com', 'adminpass890', '0911234567', '1998-02-10'),
+('Admin_Liam Taylor', 'admin_liamt@example.com', 'adminpass101', '0922345678', '1983-10-29'),
+('Admin_Isabella Moore', 'admin_isabellam@example.com', 'adminpass202', '0933456789', '1990-06-17'),
+('Admin_Elijah Thomas', 'admin_elijaht@example.com', 'adminpass303', '0944567890', '1985-09-03'),
+('Admin_Charlotte Lee', 'admin_charlottel@example.com', 'adminpass404', '0955678901', '1997-12-24'),
+('Admin_Lucas White', 'admin_lucasw@example.com', 'adminpass505', '0966789012', '1981-04-12'),
+('Admin_Amelia Harris', 'admin_ameliah@example.com', 'adminpass606', '0977890123', '1992-09-16'),
+('Admin_Henry Martin', 'admin_henrym@example.com', 'adminpass707', '0988901234', '1988-07-09'),
+('Admin_Mia Young', 'admin_miay@example.com', 'adminpass808', '0999012345', '1991-03-30'),
+('Admin_Jackson Walker', 'admin_jacksonw@example.com', 'adminpass909', '0912345679', '1986-05-18'),
+('Admin_Ella King', 'admin_ellak@example.com', 'adminpass010', '0923456780', '1994-08-11');
 
-INSERT INTO Admin (Admin_id, Name, Email, Password, Phone, Dob) VALUES
-(1, 'Admin_John Doe', 'admin_johndoe@example.com', 'adminpass123', '0912345678', '1985-04-15'),
-(2, 'Admin_Jane Smith', 'admin_janesmith@example.com', 'adminpass456', '0923456789', '1990-06-20'),
-(3, 'Admin_Michael Johnson', 'admin_michaelj@example.com', 'adminpass789', '0934567890', '1987-09-12'),
-(4, 'Admin_Emily Davis', 'admin_emilyd@example.com', 'adminpass012', '0945678901', '1992-01-25'),
-(5, 'Admin_William Brown', 'admin_williamb@example.com', 'adminpass345', '0956789012', '1980-03-05'),
-(6, 'Admin_Olivia Wilson', 'admin_oliviaw@example.com', 'adminpass678', '0967890123', '1995-08-19'),
-(7, 'Admin_James Martinez', 'admin_jamesm@example.com', 'adminpass901', '0978901234', '1989-11-03'),
-(8, 'Admin_Sophia Anderson', 'admin_sophiaa@example.com', 'adminpass234', '0989012345', '1993-05-14'),
-(9, 'Admin_Benjamin Clark', 'admin_benjaminc@example.com', 'adminpass567', '0990123456', '1984-07-22'),
-(10, 'Admin_Ava Hernandez', 'admin_avah@example.com', 'adminpass890', '0911234567', '1998-02-10'),
-(11, 'Admin_Liam Taylor', 'admin_liamt@example.com', 'adminpass101', '0922345678', '1983-10-29'),
-(12, 'Admin_Isabella Moore', 'admin_isabellam@example.com', 'adminpass202', '0933456789', '1990-06-17'),
-(13, 'Admin_Elijah Thomas', 'admin_elijaht@example.com', 'adminpass303', '0944567890', '1985-09-03'),
-(14, 'Admin_Charlotte Lee', 'admin_charlottel@example.com', 'adminpass404', '0955678901', '1997-12-24'),
-(15, 'Admin_Lucas White', 'admin_lucasw@example.com', 'adminpass505', '0966789012', '1981-04-12'),
-(16, 'Admin_Amelia Harris', 'admin_ameliah@example.com', 'adminpass606', '0977890123', '1992-09-16'),
-(17, 'Admin_Henry Martin', 'admin_henrym@example.com', 'adminpass707', '0988901234', '1988-07-09'),
-(18, 'Admin_Mia Young', 'admin_miay@example.com', 'adminpass808', '0999012345', '1991-03-30'),
-(19, 'Admin_Jackson Walker', 'admin_jacksonw@example.com', 'adminpass909', '0912345679', '1986-05-18'),
-(20, 'Admin_Ella King', 'admin_ellak@example.com', 'adminpass010', '0923456780', '1994-08-11');
+-- Movie table
+INSERT INTO Movie (Title, Description, Language, Rating, Duration, Release_Date) VALUES
+('The Great Adventure', 'An epic journey through uncharted lands.', 'EN', 8.2, 120, '2023-12-01'),
+('Love in the Moonlight', 'A romantic drama set in the early 20th century.', 'EN', 7.5, 95, '2023-11-15'),
+('Superheroes Unite', 'A team of superheroes come together to save the world.', 'EN', 8.7, 135, '2023-10-10'),
+('Silent Whisper', 'A thriller that keeps you on the edge of your seat.', 'EN', 8.1, 110, '2023-09-05'),
+('The Lost Kingdom', 'A story of a hidden kingdom and its mystical secrets.', 'EN', 7.8, 125, '2023-08-01'),
+('Summer Memories', 'A heartfelt drama about growing up and finding love.', 'EN', 7.9, 115, '2023-07-10'),
+('Dragon’s Flame', 'A fantasy film about a young warrior and a dragon.', 'EN', 8.5, 140, '2023-06-20'),
+('Mystery at Midnight', 'A detective story that unfolds at midnight.', 'EN', 7.6, 100, '2023-05-15'),
+('Space Odyssey', 'A journey through space to discover new planets.', 'EN', 9.0, 150, '2023-04-01'),
+('The Shadow of the Past', 'A psychological drama about uncovering hidden secrets.', 'EN', 7.4, 105, '2023-03-12'),
+('Time Traveler', 'A science fiction story about traveling through time.', 'EN', 8.3, 125, '2023-02-20'),
+('The Heist', 'A high-stakes heist movie filled with action and suspense.', 'EN', 7.8, 130, '2023-01-15'),
+('The Secret Garden', 'A magical journey through a hidden garden.', 'EN', 7.2, 95, '2022-12-10'),
+('Under the Sea', 'A documentary about the wonders of the ocean.', 'EN', 8.0, 110, '2022-11-05'),
+('Zombie Apocalypse', 'A group of survivors fight to stay alive in a world overrun by zombies.', 'EN', 6.9, 140, '2022-10-01'),
+('The Golden Age', 'A historical drama set in the 18th century.', 'EN', 7.7, 130, '2022-09-10'),
+('The Invisible Man', 'A thriller about a scientist who becomes invisible and goes rogue.', 'EN', 8.4, 120, '2022-08-15'),
+('Dreams of Tomorrow', 'A futuristic tale of a world where dreams are controlled.', 'EN', 7.9, 125, '2022-07-01'),
+('The Braveheart', 'A historical drama based on the true story of a brave warrior.', 'EN', 8.1, 140, '2022-06-10'),
+('The Witch’s Curse', 'A dark fantasy about a powerful witch seeking revenge.', 'EN', 7.5, 115, '2022-05-20');
 
--- Bảng Movie (20 records)
-INSERT INTO Movie (Movie_id, Title, Description, Language, Rating, Duration, Release_Date) VALUES
-(1, 'The Great Adventure', 'An epic journey through uncharted lands.', 'EN', 8.2, 120, '2023-12-01'),
-(2, 'Love in the Moonlight', 'A romantic drama set in the early 20th century.', 'EN', 7.5, 95, '2023-11-15'),
-(3, 'Superheroes Unite', 'A team of superheroes come together to save the world.', 'EN', 8.7, 135, '2023-10-10'),
-(4, 'Silent Whisper', 'A thriller that keeps you on the edge of your seat.', 'EN', 8.1, 110, '2023-09-05'),
-(5, 'The Lost Kingdom', 'A story of a hidden kingdom and its mystical secrets.', 'EN', 7.8, 125, '2023-08-01'),
-(6, 'Summer Memories', 'A heartfelt drama about growing up and finding love.', 'EN', 7.9, 115, '2023-07-10'),
-(7, 'Dragon’s Flame', 'A fantasy film about a young warrior and a dragon.', 'EN', 8.5, 140, '2023-06-20'),
-(8, 'Mystery at Midnight', 'A detective story that unfolds at midnight.', 'EN', 7.6, 100, '2023-05-15'),
-(9, 'Space Odyssey', 'A journey through space to discover new planets.', 'EN', 9.0, 150, '2023-04-01'),
-(10, 'The Shadow of the Past', 'A psychological drama about uncovering hidden secrets.', 'EN', 7.4, 105, '2023-03-12'),
-(11, 'Time Traveler', 'A science fiction story about traveling through time.', 'EN', 8.3, 125, '2023-02-20'),
-(12, 'The Heist', 'A high-stakes heist movie filled with action and suspense.', 'EN', 7.8, 130, '2023-01-15'),
-(13, 'The Secret Garden', 'A magical journey through a hidden garden.', 'EN', 7.2, 95, '2022-12-10'),
-(14, 'Under the Sea', 'A documentary about the wonders of the ocean.', 'EN', 8.0, 110, '2022-11-05'),
-(15, 'Zombie Apocalypse', 'A group of survivors fight to stay alive in a world overrun by zombies.', 'EN', 6.9, 140, '2022-10-01'),
-(16, 'The Golden Age', 'A historical drama set in the 18th century.', 'EN', 7.7, 130, '2022-09-10'),
-(17, 'The Invisible Man', 'A thriller about a scientist who becomes invisible and goes rogue.', 'EN', 8.4, 120, '2022-08-15'),
-(18, 'Dreams of Tomorrow', 'A futuristic tale of a world where dreams are controlled.', 'EN', 7.9, 125, '2022-07-01'),
-(19, 'The Braveheart', 'A historical drama based on the true story of a brave warrior.', 'EN', 8.1, 140, '2022-06-10'),
-(20, 'The Witch’s Curse', 'A dark fantasy about a powerful witch seeking revenge.', 'EN', 7.5, 115, '2022-05-20');
-
--- Bảng Redemption (20 records)
-
+-- Redemption table
 INSERT INTO Redemption (User_id, Voucher_id, Redeem_Date, Status) VALUES
 (1, 1, '2024-12-01 14:00:00', 'Available'),
 (2, 2, '2024-12-02 15:30:00', 'Available'),
@@ -224,20 +211,18 @@ INSERT INTO Redemption (User_id, Voucher_id, Redeem_Date, Status) VALUES
 (19, 9, '2024-12-19 10:00:00', 'Available'),
 (20, 10, '2024-12-20 11:00:00', 'Available');
 
--- Bảng Genre (8 records)
+-- Genre table
+INSERT INTO Genre (Name) VALUES
+('Action'),
+('Comedy'),
+('Drama'),
+('Thriller'),
+('Romance'),
+('Horror'),
+('Sci-Fi'),
+('Fantasy');
 
-INSERT INTO Genre (Genre_id, Name) VALUES
-(1, 'Action'),
-(2, 'Comedy'),
-(3, 'Drama'),
-(4, 'Thriller'),
-(5, 'Romance'),
-(6, 'Horror'),
-(7, 'Sci-Fi'),
-(8, 'Fantasy');
-
--- Bảng Movie Genre (60 records = mỗi movie có 3 genre)
-
+-- MovieGenre table 
 INSERT INTO MovieGenre (Movie_id, Genre_id) VALUES
 (1, 1),  -- The Great Adventure -> Action
 (1, 7),  -- The Great Adventure -> Sci-Fi
@@ -300,48 +285,46 @@ INSERT INTO MovieGenre (Movie_id, Genre_id) VALUES
 (20, 4), -- The Witch’s Curse -> Thriller
 (20, 8); -- The Witch’s Curse -> Fantasy
 
--- Bảng MovieManagement (20 records)
-INSERT INTO MovieManagement (manage_id, admin_id, movie_id, manage_date, description) VALUES
-(1, 1, 1, '2024-12-01 10:00:00', 'Added'),
-(2, 2, 2, '2024-12-02 14:30:00', 'Updated'),
-(3, 3, 3, '2024-12-03 16:00:00', 'Added'),
-(4, 4, 4, '2024-12-04 11:15:00', 'Removed'),
-(5, 5, 5, '2024-12-05 09:45:00', 'Updated'),
-(6, 6, 6, '2024-12-06 12:00:00', 'Added'),
-(7, 7, 7, '2024-12-07 13:30:00', 'Updated'),
-(8, 8, 8, '2024-12-08 15:00:00', 'Removed'),
-(9, 9, 9, '2024-12-09 17:00:00', 'Added'),
-(10, 10, 10, '2024-12-10 18:30:00', 'Updated'),
-(11, 11, 11, '2024-12-11 10:00:00', 'Added'),
-(12, 12, 12, '2024-12-12 14:00:00', 'Updated'),
-(13, 13, 13, '2024-12-13 16:00:00', 'Added'),
-(14, 14, 14, '2024-12-14 11:00:00', 'Removed'),
-(15, 15, 15, '2024-12-15 13:30:00', 'Updated'),
-(16, 16, 16, '2024-12-16 12:30:00', 'Added'),
-(17, 17, 17, '2024-12-17 14:30:00', 'Removed'),
-(18, 18, 18, '2024-12-18 15:30:00', 'Added'),
-(19, 19, 19, '2024-12-19 10:00:00', 'Updated'),
-(20, 20, 20, '2024-12-20 16:00:00', 'Removed');
+-- MovieManagement table
+INSERT INTO MovieManagement (admin_id, movie_id, manage_date, description) VALUES
+(1, 1, '2024-12-01 10:00:00', 'Added'),
+(2, 2, '2024-12-02 14:30:00', 'Updated'),
+(3, 3, '2024-12-03 16:00:00', 'Added'),
+(4, 4, '2024-12-04 11:15:00', 'Removed'),
+(5, 5, '2024-12-05 09:45:00', 'Updated'),
+(6, 6, '2024-12-06 12:00:00', 'Added'),
+(7, 7, '2024-12-07 13:30:00', 'Updated'),
+(8, 8, '2024-12-08 15:00:00', 'Removed'),
+(9, 9, '2024-12-09 17:00:00', 'Added'),
+(10, 10, '2024-12-10 18:30:00', 'Updated'),
+(11, 11, '2024-12-11 10:00:00', 'Added'),
+(12, 12, '2024-12-12 14:00:00', 'Updated'),
+(13, 13, '2024-12-13 16:00:00', 'Added'),
+(14, 14, '2024-12-14 11:00:00', 'Removed'),
+(15, 15, '2024-12-15 13:30:00', 'Updated'),
+(16, 16, '2024-12-16 12:30:00', 'Added'),
+(17, 17, '2024-12-17 14:30:00', 'Removed'),
+(18, 18, '2024-12-18 15:30:00', 'Added'),
+(19, 19, '2024-12-19 10:00:00', 'Updated'),
+(20, 20, '2024-12-20 16:00:00', 'Removed');
 
--- Bảng VoucherManagement (10 records = số voucher hiện tại, chỉ có trạng thái ‘Added’ vì voucher được remove tự động bởi trigger)
-INSERT INTO VoucherManagement (manage_id, admin_id, voucher_id, manage_date, description) VALUES
-(1, 1, 1, '2024-12-01 10:00:00', 'Added'),
-(2, 2, 2, '2024-12-02 14:30:00', 'Added'),
-(3, 3, 3, '2024-12-03 16:00:00', 'Added'),
-(4, 4, 4, '2024-12-04 11:15:00', 'Added'),
-(5, 5, 5, '2024-12-05 09:45:00', 'Added'),
-(6, 6, 6, '2024-12-06 12:00:00', 'Added'),
-(7, 7, 7, '2024-12-07 13:30:00', 'Added'),
-(8, 8, 8, '2024-12-08 15:00:00', 'Added'),
-(9, 9, 9, '2024-12-09 17:00:00', 'Added'),
-(10, 10, 10, '2024-12-10 18:30:00', 'Added');
+-- VoucherManagement table
+INSERT INTO VoucherManagement (admin_id, voucher_id, manage_date, description) VALUES
+(1, 1, '2024-12-01 10:00:00', 'Added'),
+(2, 2, '2024-12-02 14:30:00', 'Added'),
+(3, 3, '2024-12-03 16:00:00', 'Added'),
+(4, 4, '2024-12-04 11:15:00', 'Added'),
+(5, 5, '2024-12-05 09:45:00', 'Added'),
+(6, 6, '2024-12-06 12:00:00', 'Added'),
+(7, 7, '2024-12-07 13:30:00', 'Added'),
+(8, 8, '2024-12-08 15:00:00', 'Added'),
+(9, 9, '2024-12-09 17:00:00', 'Added'),
+(10, 10, '2024-12-10 18:30:00', 'Added');
 
--- Bảng Showtime (Showtime được tổ chức trong 5 ngày, mỗi ngày mỗi room có 3 showtime)
-
+-- Showtime table
 DO $$
 DECLARE
     room RECORD;
-    showtime_id INT := 1;
     start_time TIME;
     end_time TIME;
     show_date DATE;
@@ -364,25 +347,20 @@ BEGIN
                 end_time := start_time + INTERVAL '2 hours';
                 
                 -- Tính Movie_id phân phối tuần tự
-                movie_index := (showtime_id - 1) % movie_count + 1;
+                movie_index := (i + day_offset + room.Room_id - 1) % movie_count + 1;
 
                 -- Thêm record vào bảng Showtime
-                INSERT INTO Showtime (Showtime_id, Start_Time, End_Time, Date, Room_id, Movie_id)
-                VALUES (showtime_id, start_time, end_time, show_date, room.Room_id, movie_index);
-
-                -- Tăng Showtime_id
-                showtime_id := showtime_id + 1;
+                INSERT INTO Showtime (Start_Time, End_Time, Date, Room_id, Movie_id)
+                VALUES (start_time, end_time, show_date, room.Room_id, movie_index);
             END LOOP;
         END LOOP;
     END LOOP;
 END $$;
 
--- Bảng ShowtimeManagement (= Showtime)
-
+-- ShowtimeManagament table
 DO $$
 DECLARE
     showtime RECORD;
-    manage_id INT := 1;
     admin_id INT;
 BEGIN
     -- Lặp qua từng Showtime trong bảng Showtime
@@ -391,19 +369,14 @@ BEGIN
         admin_id := (SELECT FLOOR(1 + (RANDOM() * 20))::INT);
         
         -- Thêm record vào bảng ShowtimeManagement
-        INSERT INTO ShowtimeManagement (manage_id, admin_id, showtime_id, manage_date, description)
-        VALUES (manage_id, admin_id, showtime.Showtime_id, CURRENT_TIMESTAMP, 'Updated');
-        
-        -- Tăng manage_id
-        manage_id := manage_id + 1;
+        INSERT INTO ShowtimeManagement (admin_id, showtime_id, manage_date, description)
+        VALUES (admin_id, showtime.Showtime_id, CURRENT_TIMESTAMP, 'Updated');
     END LOOP;
 END $$;
 
-
--- Bảng Booking và BookingSeat (100 record bảng Booking, với mỗi booking id sẽ đặt random từ 1->5 vé cùng 1 Showtime, đảm bảo không trùng Seat)
+--
 DO $$
 DECLARE
-    booking_id INT := 1;
     user_id INT;
     showtime_id INT;
     seat_id INT;
@@ -411,9 +384,10 @@ DECLARE
     status VARCHAR(10);
     available_seat RECORD;
     voucher_id INT;
+    new_booking_id INT;  -- To capture the auto-generated Booking_id
 BEGIN
     -- Lặp qua từng booking
-    FOR booking_id IN 1..100 LOOP
+    FOR i IN 1..100 LOOP
         -- Chọn ngẫu nhiên user_id từ 1 đến 100
         user_id := (SELECT FLOOR(1 + (RANDOM() * 100))::INT);
         
@@ -438,8 +412,9 @@ BEGIN
         END IF;
         
         -- Thêm bản ghi vào bảng Booking
-        INSERT INTO Booking (Booking_id, Time, Status, User_id, Showtime_id, Voucher_id)
-        VALUES (booking_id, CURRENT_TIMESTAMP, status, user_id, showtime_id, voucher_id);
+        INSERT INTO Booking (Time, Status, User_id, Showtime_id, Voucher_id)
+        VALUES (CURRENT_TIMESTAMP, status, user_id, showtime_id, voucher_id)
+        RETURNING Booking_id INTO new_booking_id;  -- Capture the auto-generated Booking_id
         
         -- Lặp qua số ghế cần đặt (1 đến 5 ghế)
         FOR seat IN 1..num_seats LOOP
@@ -468,16 +443,11 @@ BEGIN
                 
                 -- Thêm ghế vào bảng BookingSeat
                 INSERT INTO BookingSeat (Booking_id, Seat_id)
-                VALUES (booking_id, seat_id);
+                VALUES (new_booking_id, seat_id);
                 
                 -- Nếu ghế đã được book, chọn ghế tiếp theo
                 EXIT;
             END LOOP;
         END LOOP;
-        
-        -- Tăng booking_id
-        booking_id := booking_id + 1;
     END LOOP;
 END $$;
-
-
