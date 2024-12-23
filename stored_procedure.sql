@@ -97,8 +97,6 @@ BEGIN
 END;
 $$;
 
-
-
 -- ============================================
 -- 2. Update Procedures: Cập nhật dữ liệu
 -- ============================================
@@ -300,7 +298,6 @@ $$;
 CREATE OR REPLACE PROCEDURE update_booking_status(
     p_booking_id INT,
     p_new_status VARCHAR(10),
-    p_admin_id INT DEFAULT NULL
 )
 LANGUAGE plpgsql
 AS $$
@@ -311,7 +308,7 @@ DECLARE
     v_loyalty_points INT;
     v_total_amount DECIMAL;
 BEGIN
-    -- Previous validation code remains the same
+    -- Validation code
     IF p_booking_id IS NULL OR p_new_status IS NULL THEN
         RAISE EXCEPTION 'Required parameters cannot be null';
     END IF;
@@ -354,8 +351,7 @@ BEGIN
         IF v_voucher_id IS NOT NULL THEN
             IF p_new_status = 'Cancelled' THEN
                 UPDATE Redemption
-                SET Status = 'Available',
-                    Redeem_Date = NULL
+                SET Status = 'Available'
                 WHERE User_id = v_user_id
                 AND Voucher_id = v_voucher_id;
             END IF;
@@ -378,41 +374,6 @@ BEGIN
             UPDATE "User"
             SET Loyalty_Points = Loyalty_Points + v_loyalty_points
             WHERE User_id = v_user_id;
-            
-        ELSIF p_new_status = 'Cancelled' THEN
-            -- If booking was previously confirmed, subtract loyalty points
-            IF v_current_status = 'Confirmed' THEN
-                SELECT SUM(st.Price)
-                INTO v_total_amount
-                FROM BookingSeat bs
-                JOIN Seat s ON bs.Seat_id = s.Seat_id
-                JOIN SeatType st ON s.Seattype_id = st.Seattype_id
-                WHERE bs.Booking_id = p_booking_id;
-
-                v_loyalty_points := FLOOR(v_total_amount * 0.05);
-
-                UPDATE "User"
-                SET Loyalty_Points = GREATEST(0, Loyalty_Points - v_loyalty_points)
-                WHERE User_id = v_user_id;
-            END IF;
-        END IF;
-
-        -- Log the status change if admin_id is provided
-        IF p_admin_id IS NOT NULL THEN
-            INSERT INTO BookingStatusLog (
-                Booking_id,
-                Admin_id,
-                Old_Status,
-                New_Status,
-                Change_Time
-            )
-            VALUES (
-                p_booking_id,
-                p_admin_id,
-                v_current_status,
-                p_new_status,
-                CURRENT_TIMESTAMP
-            );
         END IF;
 
     EXCEPTION
@@ -455,9 +416,6 @@ BEGIN
 
     -- Start transaction
     BEGIN
-        -- Simulate payment processing delay
-        PERFORM pg_sleep(1); -- Wait 1 second to simulate processing
-
         IF p_payment_status THEN
             -- Payment successful
             CALL update_booking_status(
@@ -478,5 +436,3 @@ BEGIN
     END;
 END;
 $$;
-
-
