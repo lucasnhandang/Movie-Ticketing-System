@@ -1,4 +1,7 @@
+-- ============================================
 -- 1. Update User.Loyalty_points after reedeming voucher
+-- ============================================
+
 CREATE OR REPLACE FUNCTION deduct_loyalty_points_on_redemption()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -41,8 +44,10 @@ FOR EACH ROW
 WHEN (NEW.Status = 'Available') -- Chỉ chạy khi Status là 'Available'
 EXECUTE FUNCTION deduct_loyalty_points_on_redemption();
 
-
+-- ============================================
 -- 2. Cancel Booking with status = ‘Pending’ after 10 minutes (expired)
+-- ============================================
+
 CREATE OR REPLACE FUNCTION cancel_expired_booking()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -60,8 +65,10 @@ AFTER INSERT OR UPDATE ON Booking
 FOR EACH ROW
 EXECUTE FUNCTION cancel_expired_booking();
 
-
+-- ============================================
 -- 3. Update User.Loyalty_points when Booking.status = ‘Confirmed’
+-- ============================================
+
 CREATE OR REPLACE FUNCTION update_loyalty_points_with_function()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -99,8 +106,10 @@ FOR EACH ROW
 WHEN (NEW.Status = 'Confirmed' AND OLD.Status != 'Confirmed') -- Chỉ chạy khi trạng thái chuyển thành "Confirmed"
 EXECUTE FUNCTION update_loyalty_points_with_function();
 
-
+-- ============================================
 -- 4. Check if there are any showtimes with duplicate Room_id and screening time 
+-- ============================================
+
 CREATE OR REPLACE FUNCTION check_conflicting_showtime()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -128,8 +137,10 @@ BEFORE INSERT ON Showtime
 FOR EACH ROW
 EXECUTE FUNCTION check_conflicting_showtime();
 
-
+-- ============================================
 -- 5. Check if the movie already exists in the Movie table
+-- ============================================
+
 CREATE OR REPLACE FUNCTION check_duplicate_movie()
 RETURNS TRIGGER AS $$
 BEGIN
