@@ -55,19 +55,31 @@ def generate_users(n):
             "Address": address,  # Now address is a single line
             "Date_Joined": fake.date_this_decade().strftime('%Y-%m-%d %H:%M:%S'),
             "Dob": fake.date_of_birth().strftime('%Y-%m-%d'),
-            "Loyalty_Points": random.randint(0, 3000)
+            "Loyalty_Points": random.randint(0, 1000)
         })
     return users
 
 
 # Theaters
 def generate_theaters(n):
-    theater_names = [
+    # Generate a base list of 50 unique theater names
+    base_theater_names = [
         "Galaxy Cinema", "CGV Cinemas", "Lotte Cinema", "BHD Star Cineplex",
         "MegaStar Cineplex", "Platinum Cineplex", "Cinestar", "StarLight Cinema",
         "Sunshine Cinema", "The Grand Cinema", "Moonlight Cinema", "FilmCity",
-        "Silver Screen", "Golden Reel", "Infinity Cinema"
+        "Silver Screen", "Golden Reel", "Infinity Cinema", "DreamCinema",
+        "Vision Theater", "Eclipse Cinema", "Nova Cineplex", "Starlight Reel",
+        "Aurora Screen", "Celestial Theater", "Nimbus Cinema", "Orion Cineplex",
+        "Comet Theater", "Zenith Cinema", "Astro Cineplex", "Lunar Theater",
+        "Nebula Cinema", "Spectrum Cineplex", "Mirage Cinema", "Cosmos Theater",
+        "Fusion Reel", "Vortex Cinema", "Echo Theater", "Pulse Cineplex",
+        "Flicker Cinema", "Radiance Theater", "Euphoria Screen", "Harmony Cinema",
+        "Serenity Cineplex", "Tranquil Theater", "Bliss Cinema", "Majestic Reel",
+        "Crown Theater", "Summit Cinema", "Pinnacle Cineplex", "Horizon Theater",
+        "Voyager Cinema"
     ]
+
+    theater_names = [f"{name} {suffix}" for name in base_theater_names for suffix in range(1, 50)]
 
     theaters = []
     for i in range(n):
@@ -76,7 +88,7 @@ def generate_theaters(n):
             "Name": random.choice(theater_names),
             "Address": fake.address().replace("\n", " "),
             "City": fake.city(),  # Thành phố
-            "Total_Rooms": random.randint(5, 15)
+            "Total_Rooms": 7
         })
     return theaters
 
@@ -90,7 +102,7 @@ def generate_rooms(theaters):
             rooms.append({
                 "Room_id": room_id,
                 "Name": f"Room {room_id}",
-                "Capacity": random.choice([100, 200]),
+                "Capacity": random.choice([20, 50]),
                 "Theater_id": theater['Theater_id']
             })
             room_id += 1
@@ -325,11 +337,6 @@ def generate_voucher_management(admins, vouchers):
     return managements
 
 # Movies
-import random
-from faker import Faker
-
-fake = Faker()
-
 def generate_movies(n):
     movies_by_language = {
         "Vietnamese": [
@@ -348,49 +355,49 @@ def generate_movies(n):
             "The Shawshank Redemption", "Inception", "The Dark Knight", "Avatar", "Titanic",
             "Forrest Gump", "The Godfather", "Gladiator", "Pulp Fiction", "The Matrix",
             "Interstellar", "The Prestige", "Fight Club", "The Green Mile", "The Lion King",
-            "Saving Private Ryan", "Schindler's List", "Jurassic Park", "The Avengers", "Iron Man",
+            "Saving Private Ryan", "Schindlers List", "Jurassic Park", "The Avengers", "Iron Man",
             "The Wolf of Wall Street", "Black Panther", "Toy Story", "Up", "Coco",
             "Finding Nemo", "The Incredibles", "Frozen", "Shrek", "Aladdin",
             "Harry Potter", "The Lord of the Rings", "Star Wars", "The Social Network", "Joker",
-            "Mad Max: Fury Road", "The Silence of the Lambs", "Se7en", "The Usual Suspects", "Goodfellas",
+            "Mad Max Fury Road", "The Silence of the Lambs", "Se7en", "The Usual Suspects", "Goodfellas",
             "Braveheart", "Inglourious Basterds", "Django Unchained", "Whiplash", "La La Land",
             "A Beautiful Mind", "The Pursuit of Happyness", "Slumdog Millionaire", "The Pianist", "The Big Short"
         ],
         "French": [
-            "Amelie", "La Haine", "Intouchables", "Les Choristes", "La La Land",
-            "Blue Is the Warmest Color", "The Artist", "A Prophet", "Delicatessen", "The Grand Illusion",
-            "Breathless", "The 400 Blows", "Cléo from 5 to 7", "The Diving Bell and the Butterfly", "Hiroshima Mon Amour",
+            "Amelie", "La Haine", "Intouchables", "Les Choristes", "Blue Is the Warmest Color",
+            "The Artist", "A Prophet", "Delicatessen", "The Grand Illusion", "Breathless",
+            "The 400 Blows", "Cleo from 5 to 7", "The Diving Bell and the Butterfly", "Hiroshima Mon Amour",
             "Portrait of a Lady on Fire", "La Vie en Rose", "The Chorus", "Cache", "Jules and Jim",
-            "The Past", "L.Atalante", "A Very Long Engagement", "The Class", "Tell No One",
+            "The Past", "L Atalante", "A Very Long Engagement", "The Class", "Tell No One",
             "The Intouchables", "A Prophet", "The Lovers on the Bridge", "Rust and Bone", "Love Me If You Dare",
-            "Wild Reeds", "Read My Lips", "A Summer's Tale", "The King and the Mockingbird", "Last Year at Marienbad",
+            "Wild Reeds", "Read My Lips", "A Summer Tale", "The King and the Mockingbird", "Last Year at Marienbad",
             "Army of Shadows", "Jean de Florette", "Manon des Sources", "My Life as a Zucchini", "The Triplets of Belleville",
             "La Femme Nikita", "A Town Called Panic", "Goodbye First Love", "On My Way", "The Beat That My Heart Skipped",
             "The Beautiful Troublemaker", "The Lovers", "Under the Roofs of Paris", "Amour", "Rififi"
         ],
         "Spanish": [
-            "Pan's Labyrinth", "Roma", "The Sea Inside", "The Motorcycle Diaries", "Volver",
+            "Pans Labyrinth", "Roma", "The Sea Inside", "The Motorcycle Diaries", "Volver",
             "Talk to Her", "Biutiful", "The Secret in Their Eyes", "All About My Mother", "Open Your Eyes",
             "Pain and Glory", "Wild Tales", "The Platform", "Campeones", "The Invisible Guest",
             "Even the Rain", "Julieta", "Women on the Verge of a Nervous Breakdown", "Marshland",
             "Black Bread", "Truman", "Summer 1993", "The Last Suit", "The Flower of My Secret",
-            "Broken Embraces", "Butterfly's Tongue", "Lovers of the Arctic Circle", "Dark Blue Almost Black",
+            "Broken Embraces", "Butterfly Tongue", "Lovers of the Arctic Circle", "Dark Blue Almost Black",
             "The Orphanage", "Cell 211", "The Endless Trench", "The Lighthouse of the Orcas", "Y Tu Mama Tambien",
             "Instructions Not Included", "Like Water for Chocolate", "Macario", "No One Writes to the Colonel",
-            "Cronos", "Amores Perros", "The Devil's Backbone", "The Crime of Father Amaro", "Burnt Money",
-            "Nine Queens", "Son of the Bride", "The Headless Woman", "XXY", "Wild Tales", "Zama"
+            "Cronos", "Amores Perros", "The Devils Backbone", "The Crime of Father Amaro", "Burnt Money",
+            "Nine Queens", "Son of the Bride", "The Headless Woman", "XXY", "Zama"
         ],
         "German": [
-            "Das Boot", "Good Bye Lenin!", "The Lives of Others", "Run Lola Run", "Downfall",
+            "Das Boot", "Good Bye Lenin", "The Lives of Others", "Run Lola Run", "Downfall",
             "Nowhere in Africa", "The Baader Meinhof Complex", "Wings of Desire", "Toni Erdmann", "Victoria",
             "The White Ribbon", "Phoenix", "Barbara", "Oh Boy", "Transit",
-            "Never Look Away", "The Counterfeiters", "Head-On", "The Edukators", "Soul Kitchen",
-            "The Wave", "We Are Young. We Are Strong.", "The Captain", "Alone in Berlin", "Rosenstrasse",
+            "Never Look Away", "The Counterfeiters", "Head On", "The Edukators", "Soul Kitchen",
+            "The Wave", "We Are Young We Are Strong", "The Captain", "Alone in Berlin", "Rosenstrasse",
             "The Nasty Girl", "Stalingrad", "A Coffee in Berlin", "Summer Storm", "In the Fade",
             "Cloud Atlas", "Perfume", "The Experiment", "The Harmonists", "The Tin Drum",
-            "Rainer Werner Fassbinder", "Germany Year Zero", "Marlene", "The Marriage of Maria Braun",
-            "The Blue Angel", "Nosferatu", "Metropolis", "Triumph of the Will", "Wings of Desire",
-            "Fitzcarraldo", "Aguirre, the Wrath of God", "Stroszek", "Grizzly Man", "My Best Fiend"
+            "Germany Year Zero", "Marlene", "The Marriage of Maria Braun",
+            "The Blue Angel", "Nosferatu", "Metropolis", "Triumph of the Will", "Fitzcarraldo",
+            "Aguirre the Wrath of God", "Stroszek", "Grizzly Man", "My Best Fiend"
         ],
         "Mandarin": [
             "Crouching Tiger Hidden Dragon", "Hero", "Raise the Red Lantern", "Farewell My Concubine", "Red Cliff",
@@ -405,7 +412,7 @@ def generate_movies(n):
         ],
         "Hindi": [
             "3 Idiots", "Dangal", "Lagaan", "Sholay", "Kabhi Khushi Kabhie Gham",
-            "Chak De India", "Baahubali", "PK", "Barfi!", "Bajrangi Bhaijaan",
+            "Chak De India", "Baahubali", "PK", "Barfi", "Bajrangi Bhaijaan",
             "Padmaavat", "Sanju", "Andhadhun", "Tumbbad", "Zindagi Na Milegi Dobara",
             "Dilwale Dulhania Le Jayenge", "Swades", "Rang De Basanti", "Queen", "Gully Boy",
             "Stree", "Article 15", "Kaabil", "Raazi", "Drishyam",
@@ -417,11 +424,18 @@ def generate_movies(n):
     }
 
     movies = []
+    used_titles = set()
+
     for i in range(1, n + 1):
-        # Xác định ngôn ngữ
-        language = random.choice(list(movies_by_language.keys()))
-        # Lấy tiêu đề phim phù hợp
-        title = random.choice(movies_by_language[language])
+        while True:
+            # Xác định ngôn ngữ
+            language = random.choice(list(movies_by_language.keys()))
+            # Lấy tiêu đề phim phù hợp và thêm hậu tố
+            base_title = random.choice(movies_by_language[language]).replace("'", "").replace(".", "")
+            title = f"{base_title} {random.randint(1, 10)}"
+            if title not in used_titles:
+                used_titles.add(title)
+                break
 
         movies.append({
             "Movie_id": i,
@@ -430,8 +444,9 @@ def generate_movies(n):
             "Language": language,
             "Rating": round(random.uniform(5.0, 9.9), 1),
             "Duration": random.randint(90, 180),  # Duration in minutes
-            "Release_Date": fake.date_between(start_date='-3y', end_date='today').strftime('%Y-%m-%d')
+            "Release_Date": fake.date_between(start_date='-5y', end_date='today').strftime('%Y-%m-%d')
         })
+
     return movies
 
 
@@ -459,20 +474,20 @@ def generate_movie_genres(movies, genres):
 
 
 # Example Usage
-users = generate_users(n=50000)
-movies = generate_movies(n=300)
+users = generate_users(n=100000)
+movies = generate_movies(n=1500)
 genres = generate_genres()
 movie_genres = generate_movie_genres(movies, genres)
-theaters = generate_theaters(n=100)
+theaters = generate_theaters(n=10000)
 rooms = generate_rooms(theaters)
 seat_types = generate_seat_types()
 seats = generate_seats(rooms, seat_types)
-showtimes = generate_showtimes(rooms, movies, n=180000)
-vouchers = generate_vouchers(n=1000)
+showtimes = generate_showtimes(rooms, movies, n=1000000)
+vouchers = generate_vouchers(n=10000)
 bookings = generate_bookings(users, showtimes, vouchers, n=1000000)
-admins = generate_admins(n=500)
+admins = generate_admins(n=2000)
 booking_seat = generate_booking_seat(bookings, seats)
-redemptions = generate_redemptions(users, vouchers, n=30000)
+redemptions = generate_redemptions(users, vouchers, n=1000000)
 showtime_management = generate_showtime_management(admins, showtimes)
 movie_management = generate_movie_management(admins)
 voucher_management = generate_voucher_management(admins, vouchers)
