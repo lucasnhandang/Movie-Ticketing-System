@@ -29,13 +29,12 @@ $$;
 CREATE OR REPLACE PROCEDURE InsertRedemption(
     IN input_user_id INT,
     IN input_voucher_id INT,
-    IN input_redeem_date TIMESTAMP,
-    IN input_status VARCHAR(10)
+    IN input_redeem_date  TIMESTAMPTZ
 )
 LANGUAGE plpgsql AS $$
 BEGIN
     INSERT INTO Redemption (User_id, Voucher_id, Redeem_Date, Status)
-    VALUES (input_user_id, input_voucher_id, input_redeem_date, input_status);
+    VALUES (input_user_id, input_voucher_id, input_redeem_date, 'Available');
 END;
 $$;
 
