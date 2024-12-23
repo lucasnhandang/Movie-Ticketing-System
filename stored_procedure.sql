@@ -41,7 +41,6 @@ $$;
 
 -- Thêm một suất chiếu phim mới
 CREATE OR REPLACE PROCEDURE InsertShowtime(
-    IN input_showtime_id INT,
     IN input_start_time TIME,
     IN input_end_time TIME,
     IN input_date DATE,
@@ -50,7 +49,7 @@ CREATE OR REPLACE PROCEDURE InsertShowtime(
 )
 LANGUAGE plpgsql AS $$
 BEGIN
-    INSERT INTO Showtime (Showtime_id, Start_Time, End_Time, Date, Room_id, Movie_id)
+    INSERT INTO Showtime (Start_Time, End_Time, Date, Room_id, Movie_id)
     VALUES (input_showtime_id, input_start_time, input_end_time, input_date, input_room_id, input_movie_id);
 END;
 $$;
