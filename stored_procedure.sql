@@ -105,27 +105,30 @@ $$;
 -- ============================================
 
 -- Cập nhật thông tin bộ phim
-CREATE OR REPLACE PROCEDURE UpdateMovie(
-    IN input_movie_id INT,
+CREATE OR REPLACE PROCEDURE UpdateMovieByTitle(
     IN input_title VARCHAR(100),
     IN input_description TEXT,
-    IN input_language VARCHAR(10),
-    IN input_rating DECIMAL(2, 1),
-    IN input_duration INT,
-    IN input_release_date DATE
+    IN input_rating DECIMAL(2, 1)
 )
 LANGUAGE plpgsql AS $$
 BEGIN
+    -- Kiểm tra xem tên phim có tồn tại không
+    IF NOT EXISTS (SELECT 1 FROM Movie WHERE Title = input_title) THEN
+        RAISE EXCEPTION 'Movie with title "%" does not exist.', input_title;
+    END IF;
+
+    -- Cập nhật Description và Rating của phim
     UPDATE Movie
-    SET Title = input_title,
+    SET 
         Description = input_description,
-        Language = input_language,
-        Rating = input_rating,
-        Duration = input_duration,
-        Release_Date = input_release_date
-    WHERE Movie_id = input_movie_id;
+        Rating = input_rating
+    WHERE Title = input_title;
+
+    -- Hiển thị thông báo thành công
+    RAISE NOTICE 'Movie "%", Description and Rating updated successfully.', input_title;
 END;
 $$;
+
 
 -- Cập nhật thông tin đổi thưởng
 CREATE OR REPLACE PROCEDURE UpdateRedemption(
