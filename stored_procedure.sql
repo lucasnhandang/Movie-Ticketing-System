@@ -297,7 +297,7 @@ $$;
 -- Modify the update_booking_status procedure
 CREATE OR REPLACE PROCEDURE update_booking_status(
     p_booking_id INT,
-    p_new_status VARCHAR(10),
+    p_new_status VARCHAR(10)
 )
 LANGUAGE plpgsql
 AS $$
