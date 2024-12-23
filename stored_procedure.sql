@@ -158,31 +158,36 @@ END;
 $$;
 
 -- Cập nhật thông tin người dùng
-CREATE OR REPLACE PROCEDURE UpdateUser(
-    IN input_user_id INT,
-    IN input_name VARCHAR(100),
-    IN input_email VARCHAR(100),
-    IN input_password VARCHAR(50),
-    IN input_phone VARCHAR(20),
-    IN input_address VARCHAR(200),
-    IN input_date_joined TIMESTAMP,
-    IN input_dob DATE,
-    IN input_loyalty_points INT
+CREATE OR REPLACE FUNCTION update_user_by_email(
+    emails VARCHAR, 
+    names VARCHAR DEFAULT NULL, 
+    passwords VARCHAR DEFAULT NULL, 
+    phones VARCHAR DEFAULT NULL, 
+    addresss VARCHAR DEFAULT NULL, 
+    dobs DATE DEFAULT NULL 
 )
-LANGUAGE plpgsql AS $$ 
-BEGIN 
-UPDATE "User" 
-SET 	Name = input_name,
- 	Email = input_email,
- 	Password = input_password,
- 	Phone = input_phone,
- 	Address = input_address,
- 	Date_Joined = input_date_joined,
- 	Dob = input_dob,
- 	Loyalty_Points = input_loyalty_points 
-WHERE User_id = input_user_id; 
-END; 
-$$;
+RETURNS VOID AS $$
+BEGIN
+    -- Kiểm tra xem email có tồn tại không
+    IF NOT EXISTS (SELECT 1 FROM "User" u WHERE u.Email = emails) THEN 
+        RAISE EXCEPTION 'User with email % does not exist.', emails; 
+    END IF;
+
+    -- Cập nhật thông tin người dùng
+    UPDATE "User"
+    SET 
+        Name = COALESCE(names, Name), 
+        Password = COALESCE(passwords, Password), 
+        Phone = COALESCE(phones, Phone), 
+        Address = COALESCE(addresss, Address), 
+        Dob = COALESCE(dobs, Dob) 
+    WHERE Email = emails; 
+
+    -- Hiển thị thông báo thành công (tuỳ chọn)
+    RAISE NOTICE 'User with email % has been updated successfully.', emails; 
+END;
+$$ LANGUAGE plpgsql;
+
 
 
 -- Cập nhật thông tin voucher 
