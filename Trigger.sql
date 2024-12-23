@@ -45,49 +45,45 @@ WHEN (NEW.Status = 'Available') -- Chỉ chạy khi Status là 'Available'
 EXECUTE FUNCTION deduct_loyalty_points_on_redemption();
 
 -- ============================================
--- 2. Cancel Booking with status = ‘Pending’ after 10 minutes (expired)
--- ============================================
-
--- ============================================
 -- 3. Update User.Loyalty_points when Booking.status = ‘Confirmed’
 -- ============================================
 
-CREATE OR REPLACE FUNCTION update_loyalty_points_with_function()
-RETURNS TRIGGER AS $$
-DECLARE
-    total_price INT; -- Total price of the booking
-    loyalty_points_to_add INT; -- Loyalty points to be added
-    current_loyalty_points INT; -- Current loyalty points of the user
-BEGIN
-    -- Call the CalculateBookingPrice function to calculate the total price of the booking
-    total_price := CalculateBookingPrice(NEW.Booking_id);
+-- CREATE OR REPLACE FUNCTION update_loyalty_points_with_function()
+-- RETURNS TRIGGER AS $$
+-- DECLARE
+--     total_price INT; -- Total price of the booking
+--     loyalty_points_to_add INT; -- Loyalty points to be added
+--     current_loyalty_points INT; -- Current loyalty points of the user
+-- BEGIN
+--     -- Call the CalculateBookingPrice function to calculate the total price of the booking
+--     total_price := CalculateBookingPrice(NEW.Booking_id);
 
-    -- Calculate loyalty points (5% of the total price)
-    loyalty_points_to_add := (total_price * 5) / 100;
+--     -- Calculate loyalty points (5% of the total price)
+--     loyalty_points_to_add := (total_price * 5) / 100;
 
-    -- Fetch the current loyalty points of the user
-    SELECT Loyalty_Points INTO current_loyalty_points
-    FROM "User"
-    WHERE User_id = NEW.User_id;
+--     -- Fetch the current loyalty points of the user
+--     SELECT Loyalty_Points INTO current_loyalty_points
+--     FROM "User"
+--     WHERE User_id = NEW.User_id;
 
-    -- Add loyalty points to the user's account
-    UPDATE "User"
-    SET Loyalty_Points = COALESCE(Loyalty_Points, 0) + loyalty_points_to_add
-    WHERE User_id = NEW.User_id;
+--     -- Add loyalty points to the user's account
+--     UPDATE "User"
+--     SET Loyalty_Points = COALESCE(Loyalty_Points, 0) + loyalty_points_to_add
+--     WHERE User_id = NEW.User_id;
 
-    -- Display a notice about the loyalty points update
-    RAISE NOTICE 'User with User_id % has been awarded % loyalty points. Current loyalty points are now %.',
-        NEW.User_id, loyalty_points_to_add, COALESCE(current_loyalty_points, 0) + loyalty_points_to_add;
+--     -- Display a notice about the loyalty points update
+--     RAISE NOTICE 'User with User_id % has been awarded % loyalty points. Current loyalty points are now %.',
+--         NEW.User_id, loyalty_points_to_add, COALESCE(current_loyalty_points, 0) + loyalty_points_to_add;
 
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+--     RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_update_loyalty_points_with_function
-AFTER UPDATE ON Booking
-FOR EACH ROW
-WHEN (NEW.Status = 'Confirmed' AND OLD.Status != 'Confirmed') -- Chỉ chạy khi trạng thái chuyển thành "Confirmed"
-EXECUTE FUNCTION update_loyalty_points_with_function();
+-- CREATE TRIGGER trigger_update_loyalty_points_with_function
+-- AFTER UPDATE ON Booking
+-- FOR EACH ROW
+-- WHEN (NEW.Status = 'Confirmed' AND OLD.Status != 'Confirmed') -- Chỉ chạy khi trạng thái chuyển thành "Confirmed"
+-- EXECUTE FUNCTION update_loyalty_points_with_function();
 
 -- ============================================
 -- 4. Check if there are any showtimes with duplicate Room_id and screening time 
