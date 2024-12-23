@@ -38,11 +38,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_deduct_loyalty_points_on_redemption
+CREATE OR REPLACE TRIGGER trigger_deduct_loyalty_points_on_redemption
 AFTER INSERT ON Redemption
 FOR EACH ROW
 WHEN (NEW.Status = 'Available') -- Chỉ chạy khi Status là 'Available'
 EXECUTE FUNCTION deduct_loyalty_points_on_redemption();
+
 
 -- ============================================
 -- 3. Update User.Loyalty_points when Booking.status = ‘Confirmed’
