@@ -372,8 +372,8 @@ BEGIN
             JOIN SeatType st ON s.Seattype_id = st.Seattype_id
             WHERE bs.Booking_id = p_booking_id;
 
-            -- Calculate loyalty points (5% of total amount)
-            v_loyalty_points := FLOOR(v_total_amount * 0.05);
+            -- Calculate loyalty points (0.5% of total amount)
+            v_loyalty_points := FLOOR(v_total_amount * 0.0005);
 
             -- Add loyalty points
             UPDATE "User"
