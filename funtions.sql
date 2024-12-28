@@ -231,7 +231,139 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION get_booking_info(booking_id_param INT)
+RETURNS TABLE (
+    user_name VARCHAR,
+    theater_name VARCHAR,
+    room_name VARCHAR,
+    movie_title VARCHAR,
+    start_time TIME,
+    end_time TIME,
+    seats TEXT,
+    total_price INT,
+    loyalty_points INT
+) AS $$
+BEGIN
+    RETURN QUERY
+    WITH seat_details AS (
+        SELECT 
+            b.booking_id,
+            STRING_AGG(s.row || s.number || ' (' || st.name || ')', ', ') as booked_seats,
+            SUM(st.price)::INT as total_seat_price
+        FROM Booking b
+        JOIN BookingSeat bs ON b.booking_id = bs.booking_id
+        JOIN Seat s ON bs.seat_id = s.seat_id
+        JOIN SeatType st ON s.seattype_id = st.seattype_id
+        WHERE b.booking_id = booking_id_param
+        GROUP BY b.booking_id
+    )
+    SELECT 
+        u.name,
+        t.name,
+        r.name,
+        m.title,
+        sh.start_time,
+        sh.end_time,
+        sd.booked_seats,
+        (CASE 
+            WHEN b.voucher_id IS NOT NULL THEN 
+                sd.total_seat_price - (sd.total_seat_price * v.discount_percentage / 100)
+            ELSE sd.total_seat_price
+        END)::INT,
+        (CEIL(
+            CASE 
+                WHEN b.voucher_id IS NOT NULL THEN 
+                    (sd.total_seat_price - (sd.total_seat_price * v.discount_percentage / 100)) * 0.05
+                ELSE sd.total_seat_price * 0.05
+            END
+        ))::INT
+    FROM Booking b
+    JOIN "User" u ON b.user_id = u.user_id
+    JOIN Showtime sh ON b.showtime_id = sh.showtime_id
+    JOIN Room r ON sh.room_id = r.room_id
+    JOIN Theater t ON r.theater_id = t.theater_id
+    JOIN Movie m ON sh.movie_id = m.movie_id
+    JOIN seat_details sd ON b.booking_id = sd.booking_id
+    LEFT JOIN Voucher v ON b.voucher_id = v.voucher_id
+    WHERE b.booking_id = booking_id_param;
+END;
+$$ LANGUAGE plpgsql;
 
+-- Tính số tiền người dùng đã tiêu để xem phim trong 1 tháng
+CREATE OR REPLACE FUNCTION CalculateUserMonthlySpending(UserId INT, Month INT, Year INT)
+RETURNS NUMERIC AS $$
+DECLARE
+    TotalSpent NUMERIC := 0;
+BEGIN
+    -- Tính tổng tiền
+    SELECT COALESCE(SUM(st.Price), 0) INTO TotalSpent
+    FROM Booking b
+    INNER JOIN BookingSeat bs ON b.Booking_id = bs.Booking_id
+    INNER JOIN Seat s ON bs.Seat_id = s.Seat_id
+    INNER JOIN SeatType st ON s.Seattype_id = st.Seattype_id
+    WHERE b.User_id = UserId
+      AND EXTRACT(MONTH FROM b.Time) = Month
+      AND EXTRACT(YEAR FROM b.Time) = Year
+      AND b.Status = 'Confirmed'; -- Chỉ tính những booking đã được xác nhận
 
+    RETURN TotalSpent;
+END;
+$$ LANGUAGE plpgsql;
 
+-- Tính số tiền người dùng đã tiêu để xem phim trong 1 năm
+CREATE OR REPLACE FUNCTION CalculateUserYearlySpending(UserId INT, Year INT)
+RETURNS NUMERIC AS $$
+DECLARE
+    TotalSpent NUMERIC := 0;
+BEGIN
+    -- Tính tổng tiền người dùng đã chi trong năm
+    SELECT COALESCE(SUM(st.Price), 0) INTO TotalSpent
+    FROM Booking b
+    INNER JOIN BookingSeat bs ON b.Booking_id = bs.Booking_id
+    INNER JOIN Seat s ON bs.Seat_id = s.Seat_id
+    INNER JOIN SeatType st ON s.Seattype_id = st.Seattype_id
+    WHERE b.User_id = UserId
+      AND EXTRACT(YEAR FROM b.Time) = Year
+      AND b.Status = 'Confirmed'; -- Chỉ tính những booking đã được xác nhận
+
+    RETURN TotalSpent;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Tính số bộ phim người dùng đã xem trong tháng
+CREATE OR REPLACE FUNCTION CountUserMoviesWatchedInMonth(UserId INT, Month INT, Year INT)
+RETURNS INT AS $$
+DECLARE
+    MovieCount INT := 0;
+BEGIN
+    -- Tính số lượng bộ phim đã xem trong tháng
+    SELECT COUNT(DISTINCT s.Movie_id) INTO MovieCount
+    FROM Booking b
+    INNER JOIN Showtime s ON b.Showtime_id = s.Showtime_id
+    WHERE b.User_id = UserId
+      AND EXTRACT(MONTH FROM b.Time) = Month
+      AND EXTRACT(YEAR FROM b.Time) = Year
+      AND b.Status = 'Confirmed'; -- Chỉ tính những booking đã được xác nhận
+
+    RETURN MovieCount;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Tính số phim người dùng đã xem trong năm
+CREATE OR REPLACE FUNCTION CountUserMoviesWatchedInYear(UserId INT, Year INT)
+RETURNS INT AS $$
+DECLARE
+    MovieCount INT := 0;
+BEGIN
+    -- Tính số lượng bộ phim đã xem trong năm
+    SELECT COUNT(DISTINCT s.Movie_id) INTO MovieCount
+    FROM Booking b
+    INNER JOIN Showtime s ON b.Showtime_id = s.Showtime_id
+    WHERE b.User_id = UserId
+      AND EXTRACT(YEAR FROM b.Time) = Year
+      AND b.Status = 'Confirmed'; -- Chỉ tính những booking đã được xác nhận
+
+    RETURN MovieCount;
+END;
+$$ LANGUAGE plpgsql;
 
