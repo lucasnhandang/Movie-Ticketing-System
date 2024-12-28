@@ -54,17 +54,17 @@ CREATE TABLE SeatType (
 
 CREATE TABLE Seat (
     Seat_id SERIAL PRIMARY KEY,
-    Row VARCHAR(2),
-    Number INT,
+    Row VARCHAR(2) NOT NULL,
+    Number INT NOT NULL,
     Seattype_id INT REFERENCES SeatType(Seattype_id),
     Room_id INT REFERENCES Room(Room_id)
 );
 
 CREATE TABLE Showtime (
     Showtime_id SERIAL PRIMARY KEY,
-    Start_Time TIME,
-    End_Time TIME,
-    Date DATE,
+    Start_Time TIME NOT NULL,
+    End_Time TIME NOT NULL,
+    Date DATE NOT NULL,
     Room_id INT REFERENCES Room(Room_id),
     Movie_id INT REFERENCES Movie(Movie_id)
 );
@@ -79,7 +79,7 @@ CREATE TABLE Voucher (
 
 CREATE TABLE Booking (
     Booking_id SERIAL PRIMARY KEY,
-    Time TIMESTAMP,
+    Time TIMESTAMP NOT NULL,
     Status VARCHAR(10) CHECK (Status IN ('Pending', 'Confirmed', 'Cancelled')),
     User_id INT NOT NULL REFERENCES "User"(User_id),
     Showtime_id INT NOT NULL REFERENCES Showtime(Showtime_id),
@@ -95,7 +95,7 @@ CREATE TABLE BookingSeat (
 CREATE TABLE Redemption (
     User_id INT REFERENCES "User"(User_id),
     Voucher_id INT REFERENCES Voucher(Voucher_id),
-    Redeem_Date TIMESTAMP,
+    Redeem_Date TIMESTAMP NOT NULL,
     Status VARCHAR(10) CHECK (Status IN ('Available', 'Used', 'Expired')),
     PRIMARY KEY (User_id, Voucher_id)
 );
@@ -113,7 +113,7 @@ CREATE TABLE ShowtimeManagement (
     Manage_id SERIAL PRIMARY KEY,             
     Admin_id INT REFERENCES Admin(Admin_id),  
     Showtime_id INT REFERENCES Showtime(Showtime_id), 
-    Manage_date TIMESTAMP,
+    Manage_date TIMESTAMP NOT NULL,
     Description VARCHAR(10)
 );
 
@@ -121,7 +121,7 @@ CREATE TABLE MovieManagement (
     Manage_id SERIAL PRIMARY KEY,             
     Admin_id INT REFERENCES Admin(Admin_id),  
     Movie_id INT REFERENCES Movie(Movie_id),  
-    Manage_date TIMESTAMP,
+    Manage_date TIMESTAMP NOT NULL,
     Description VARCHAR(10)                    
 );
 
@@ -129,6 +129,6 @@ CREATE TABLE VoucherManagement (
     Manage_id SERIAL PRIMARY KEY,             
     Admin_id INT REFERENCES Admin(Admin_id),  
     Voucher_id INT REFERENCES Voucher(Voucher_id),
-    Manage_date TIMESTAMP,
+    Manage_date TIMESTAMP NOT NULL,
     Description VARCHAR(10)                     
 );
