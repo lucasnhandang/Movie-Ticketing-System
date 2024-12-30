@@ -1,4 +1,4 @@
--- 1. MovieGenresInfo
+-- 1. MovieGenresInfo (VIEW)
 -- This view provides detailed information about movies along with their associated genres. 
 -- It includes all movie attributes and the genre name, enabling easy retrieval of movies categorized by their genres. 
 -- Useful for filtering or grouping movies by genre in analytics or user-facing applications.
@@ -12,12 +12,12 @@ JOIN MovieGenre mg ON m.Movie_id = mg.Movie_id
 JOIN Genre g ON mg.Genre_id = g.Genre_id
 GROUP BY M.Movie_id, M.Title;
 
--- 2. ShowtimeOccupancy
+-- 2. ShowtimeOccupancy (MATERIALIZED VIEW)
 -- This view provides detailed occupancy data for each showtime, including the theater name, movie title, showtime date and start time, 
 -- total confirmed bookings, seats booked, room capacity, and occupancy rate (percentage of seats filled). 
 -- It helps analyze theater performance and optimize scheduling or promotions.
 
-CREATE VIEW ShowtimeOccupancy AS
+CREATE MATERIALIZED VIEW ShowtimeOccupancy AS
 SELECT 
     t.name AS theater_name,
     m.title AS movie_title,
@@ -38,15 +38,14 @@ GROUP BY
     m.title,
     s.date,
     s.start_time,
-    r.capacity
-ORDER BY seats_booked DESC;
+    r.capacity;
 
--- 3. TopBookingUsers
+-- 3. TopBookingUsers (MATERIALIZED VIEW)
 -- This view provides a ranked list of users based on the number of confirmed bookings they have made. 
 -- It includes user details such as ID, name, email, and the total count of confirmed bookings, ordered from highest to lowest. 
 -- It is useful for identifying the most active and loyal customers.
 
-CREATE VIEW TopBookingUsers AS
+CREATE MATERIALIZED VIEW TopBookingUsers AS
 SELECT 
     u.User_id,
     u.Name AS UserName,
@@ -58,7 +57,7 @@ WHERE b.Status = 'Confirmed'
 GROUP BY u.User_id, u.Name, u.Email
 ORDER BY TotalBookings DESC;
 
--- 4. DetailedBookingSummary
+-- 4. DetailedBookingSummary (VIEW)
 -- This view provides a comprehensive summary of booking details, including user information, booking time and status, movie title, 
 -- showtime schedule, theater details (name and city), seat information (row, number, type, and price), 
 -- and sorts the results by the most recent bookings.
@@ -89,30 +88,23 @@ JOIN Seat S ON BS.Seat_id = S.Seat_id
 JOIN SeatType SType ON S.Seattype_id = SType.Seattype_id
 ORDER BY B.Time DESC;
 
--- 5. MoviePerformance
+-- 5. MoviePerformance (MATERIALIZED VIEW)
 -- This view provides a performance summary of movies, including the number of showtimes, total bookings, and total revenue 
 -- generated for each movie. It aggregates data from related tables to offer an overview of movie effectiveness 
 -- sorted by revenue in descending order.
 
-CREATE VIEW MoviePerformance AS
+CREATE MATERIALIZED VIEW MoviePerformance AS
 SELECT 
     m.Title AS Movie_Name,
     COUNT(DISTINCT s.Showtime_id) AS Total_Showtimes,
     COUNT(DISTINCT b.Booking_id) AS Total_Bookings,
-    COALESCE(SUM(bs.Total_Price), 0) AS Total_Revenue
+    COALESCE(SUM(st.Price), 0) AS Total_Revenue
 FROM 
     Movie m
 LEFT JOIN Showtime s ON m.Movie_id = s.Movie_id
 LEFT JOIN Booking b ON s.Showtime_id = b.Showtime_id
-LEFT JOIN (
-    SELECT 
-        bs.Booking_id,
-        SUM(st.Price) AS Total_Price
-    FROM 
-        BookingSeat bs
-    JOIN Seat seat ON bs.Seat_id = seat.Seat_id
-    JOIN SeatType st ON seat.Seattype_id = st.Seattype_id
-    GROUP BY bs.Booking_id
-) bs ON b.Booking_id = bs.Booking_id
+LEFT JOIN BookingSeat bs ON b.Booking_id = bs.Booking_id
+LEFT JOIN Seat seat ON bs.Seat_id = seat.Seat_id
+LEFT JOIN SeatType st ON seat.Seattype_id = st.Seattype_id
 GROUP BY m.Title
 ORDER BY Total_Revenue DESC;
