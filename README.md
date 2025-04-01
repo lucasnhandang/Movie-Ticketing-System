@@ -24,7 +24,8 @@ The **Movie Ticketing System** is designed to simulate the operations of an onli
 
 - **Database**: PostgreSQL for relational data management.
 - **Tools Used**: 
-  - ERD design with erdplus.com.
+  - ERD design with **drawio**.
+  - RS design with **dbdiagram.io**.
   - SQL scripts for database schema creation and queries.
 
 ---
@@ -74,8 +75,8 @@ Here's how you can help:
 --- 
 ## Contributors
 
-| **Name**           | **Student ID**               | **Responsibilities** |
-|---------------------|------------------------|----------------------|
-| Dang Van Nhan       | 20225990      | Team Leader          |
-| Nguyen Lan Nhi           | 20225991      | Member               |
-| Duong Phuong Thao         | 20226001     | Member   |
+| **Name**           | **Student ID**               | **Role**    |
+|---------------------|------------------------|-------------|
+| Dang Van Nhan       | 20225990      | Team Leader |
+| Nguyen Lan Nhi           | 20225991      | Member      |
+| Duong Phuong Thao         | 20226001     | Member      |
